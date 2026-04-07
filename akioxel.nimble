@@ -10,3 +10,5 @@ srcDir        = "src"
 # Dependencies
 
 requires "nim >= 2.2.8"
+requires "naylib"
+requires "vmath >= 2.0.0"
