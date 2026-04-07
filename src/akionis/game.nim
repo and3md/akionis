@@ -24,6 +24,7 @@ proc initGame*(windowWidth, windowHeight: int32, title: string) =
     raise newException(ValueError, "Game already created")
 
 proc run*(game: Game) =
+  ## Runs the game loop 
   while not ray.windowShouldClose():
     ray.beginDrawing()
     ray.clearBackground(ray.DarkGray)
