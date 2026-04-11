@@ -33,6 +33,7 @@ type
 
   Node* = ref object of RootObj
     children: seq[Node]
+    parent: Node
     components: seq[Component]
     matrix: Matrix3
     x: float32
