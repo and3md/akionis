@@ -2,6 +2,8 @@ import vmath
 from raylib as ray import nil
 
 type
+  Matrix3* = GMat3[float32]
+
   Game* = ref object of RootObj
     cameras: seq[Camera]
     states: seq[State]
@@ -14,7 +16,7 @@ type
     scaleY: float32
     rotation: float32
     dirty: bool ## Should we recalculate camera matrix
-    matrix: GMat3[float32]
+    matrix: Matrix3
 
   State* = ref object of RootObj
     nodes: seq[Node]
