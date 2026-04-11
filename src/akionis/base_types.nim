@@ -1,3 +1,4 @@
+import std/options
 import vmath
 from raylib as ray import nil
 
@@ -6,10 +7,17 @@ type
 
   Game* = ref object of RootObj
     cameras: seq[Camera]
+    lastCameraId: Option[CameraId]
     states: seq[State]
     title: string
 
+  CameraId* = enum 
+    Camera1, Camera2, Camera3, Camera4, Camera5, Camera6, Camera7, Camera8
+
+  CameraMask* = set[CameraId]
+
   Camera* = ref object of RootObj
+    id: CameraId
     x: float32
     y: float32
     scaleX: float32
