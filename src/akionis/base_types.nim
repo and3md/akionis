@@ -15,6 +15,7 @@ type
   CameraMask* = set[CameraId]
 
   Camera* = ref object of RootObj
+    matrix: Matrix3
     id: CameraId
     x: float32
     y: float32
@@ -22,7 +23,7 @@ type
     scaleY: float32
     rotation: float32
     dirty: bool ## Should we recalculate camera matrix
-    matrix: Matrix3
+    
 
   State* = ref object of RootObj
     name*: string
