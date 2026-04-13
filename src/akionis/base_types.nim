@@ -33,7 +33,7 @@ type
     dirty: bool = true ## Should we recalculate camera matrix
 
   State* = ref object of RootObj
-    name*: string
+    name*: string ## State name - no special meaning only for identification
     subState: State
     persistentUpdate*: bool = false ## Should be updated when there is a subState
     rootNode: RootNode ## The root node to which we add other nodes
