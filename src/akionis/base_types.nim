@@ -5,6 +5,12 @@ import colors
 from raylib as ray import nil
 
 type
+  Rectangle = ray.Rectangle
+
+  Size* = object
+    width: int32
+    height: int32
+
   Game* = ref object of RootObj
     cameras: seq[Camera]
     lastCameraId: Option[CameraId]
