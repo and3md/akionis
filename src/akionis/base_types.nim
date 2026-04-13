@@ -71,7 +71,8 @@ proc getGame*(): Game =
     raise newException(NoGameInstance, "No game instance")
   return instance
 
-# ---------------   Camera   ----------------------
+# ---------------   Node   ----------------------
+
 proc x*(node: Node): float32 =
   return node.x
 
@@ -100,7 +101,7 @@ proc `scaleY`*(node: Node, newScaleY: float32) =
   node.scaleY = newScaleY
   node.dirty = true
 
-proc rotation*(node: Node): float32 = 
+proc rotation*(node: Node): float32 =
   return node.rotation
 
 proc rotation*(node: Node, newRotation: float) =
