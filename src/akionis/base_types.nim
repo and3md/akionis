@@ -48,6 +48,7 @@ type
     subState: State
     persistentUpdate*: bool = false ## Should be updated when there is a subState
     rootNode: RootNode ## The root node to which we add other nodes
+    game: Game ## Reference to game
 
   Node* = ref object of RootObj
     children: seq[Node]
@@ -95,8 +96,11 @@ proc getGame*(): Game =
   return instance
 
 # ---------------   RenderComponent   ----------------------
-method draw*(comp: RenderedComponent) =
+method draw*(comp: RenderedComponent, camera: Camera) =
   discard
+
+method addCamera*(comp: RenderedComponent, cam: Camera) =
+  comp.cameras.incl(cam.id)
 
 # ---------------   Square   ----------------------
 
@@ -105,7 +109,7 @@ proc newSquare*(size: float32, color: Color): Square =
   result.size = size
   result.color = color
 
-method draw*(square: Square) =
+method draw*(square: Square, camera: Camera) =
   let data = decomposeMatrix(
     square.parent.worldMatrix * translate(vec2(square.offsetX, square.offsetY))
   )
@@ -194,16 +198,17 @@ proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
       child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty)
     node.dirty = false
 
-proc render(node: Node) =
+proc render(node: Node, camera: Camera) =
   for comp in node.components:
     if comp of RenderedComponent:
       let renderComp = RenderedComponent(comp)
-      renderComp.draw
+      if camera.id in renderComp.cameras:
+        renderComp.draw(camera)
 
-proc doRender(node: Node) =
-  node.render
+proc doRender(node: Node, camera: Camera) =
+  node.render(camera)
   for child in node.children:
-    child.doRender
+    child.doRender(camera)
 
 # ---------------   RootNode   ----------------------
 
@@ -215,6 +220,11 @@ proc updateAllTransforms(node: RootNode) =
   # we use false and identity matrix on first level
   # because this is checked in updateTransforms() proc
   node.updateTransforms(mat3(), false)
+
+proc renderWithAllCameras(node: RootNode) =
+  for cam in node.parentState.game.cameras:
+    if cam.isActive:
+      node.doRender(cam)
 
 # ---------------   Camera   ----------------------
 
@@ -245,9 +255,11 @@ proc resizeCameraTexture(cam: Camera, newSize: Size) =
 
 # ---------------   State   ----------------------
 
-proc initState*(self: State, name: string) =
+proc initState*(self: State, game: Game, name: string) =
   self.name = name
   self.rootNode = new(RootNode)
+  self.rootNode.parentState = self
+  self.game = game
 
 method close*(state: State) =
   echo "Close state ", state.name
@@ -289,7 +301,7 @@ proc openSubState(parentState, subState: State) =
 proc doRender(state: State) =
   if state.isNil:
     return
-  state.rootNode.doRender()
+  state.rootNode.renderWithAllCameras()
   if not state.subState.isNil:
     doRender(state.subState)
 
@@ -302,6 +314,9 @@ proc doUpdateTransform(state: State) =
 
 proc rootNode*(state: State): RootNode =
   return state.rootNode
+
+proc game*(state: State): Game =
+  return state.game
 
 # ---------------   Game   ----------------------
 
@@ -338,6 +353,12 @@ proc title*(game: Game): string =
 proc `title=`*(game: Game, newTitle: string) =
   ray.setWindowTitle(newTitle)
   game.title = newTitle
+
+proc getDefaultCamera*(game: Game): Camera =
+  if game.cameras.len == 0:
+    discard game.addFullScreenCamera(0.0,0.0)
+
+  return game.cameras[0]
 
 proc openRootState*(game: Game, state: State) =
   if not game.state.isNil:
