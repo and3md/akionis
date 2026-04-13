@@ -78,6 +78,36 @@ proc `x=`*(node: Node, newX: float32) =
   node.x = newX
   node.dirty = true
 
+proc y*(node: Node): float32 =
+  return node.y
+
+proc `y=`*(node: Node, newY: float32) =
+  node.y = newY
+  node.dirty = true
+
+proc scaleX*(node: Node): float32 =
+  return node.scaleX
+
+proc `scaleX`*(node: Node, newScaleX: float32) =
+  node.scaleX = newScaleX
+  node.dirty = true
+
+proc scaleY*(node: Node): float32 =
+  return node.scaleY
+
+proc `scaleY`*(node: Node, newScaleY: float32) =
+  node.scaleY = newScaleY
+  node.dirty = true
+
+proc rotation*(node: Node): float32 = 
+  return node.rotation
+
+proc rotation*(node: Node, newRotation: float) =
+  node.rotation = newRotation
+  node.dirty = true
+
+
+
 # ---------------   Camera   ----------------------
 
 proc initCamera*(x, y, scaleX, scaleY, rotation: float32): Camera =
