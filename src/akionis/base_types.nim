@@ -370,4 +370,3 @@ proc doResize*(game: Game) =
       cam.resizeCameraTexture(
         Size(width: ray.getRenderWidth(), height: ray.getRenderHeight())
       )
-
