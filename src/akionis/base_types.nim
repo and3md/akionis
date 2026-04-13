@@ -9,8 +9,15 @@ type
     state: State
     title: string
 
-  CameraId* = enum 
-    Camera1, Camera2, Camera3, Camera4, Camera5, Camera6, Camera7, Camera8
+  CameraId* = enum
+    Camera1
+    Camera2
+    Camera3
+    Camera4
+    Camera5
+    Camera6
+    Camera7
+    Camera8
 
   CameraMask* = set[CameraId]
 
@@ -23,7 +30,6 @@ type
     scaleY: float32
     rotation: float32
     dirty: bool ## Should we recalculate camera matrix
-    
 
   State* = ref object of RootObj
     name*: string
@@ -43,7 +49,6 @@ type
     rotation: float32
     dirty: bool ## Should we recalculate camera matrix
 
-
   RootNode* = ref object of Node
     parentState: State
 
@@ -51,10 +56,10 @@ type
     name: string
     enabled: bool
 
-  AkionisExcpetion* = object of CatchableError
-    ## Base Akionis exception
+  AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
     ## Raised after second try game creation 
+
   NoGameInstance* = object of AkionisExcpetion
     ## Trying to get a game instance but was not created
 
@@ -66,10 +71,10 @@ proc getGame*(): Game =
   return instance
 
 # ---------------   Camera   ----------------------
-proc x*(node: Node):float32 =
+proc x*(node: Node): float32 =
   return node.x
 
-proc `x=`*(node:Node, newX: float32) = 
+proc `x=`*(node: Node, newX: float32) =
   node.x = newX
   node.dirty = true
 
@@ -80,37 +85,37 @@ proc initCamera*(x, y, scaleX, scaleY, rotation: float32): Camera =
 
 # ---------------   State   ----------------------
 
-method close*(state:State) = 
+method close*(state: State) =
   echo "Close state ", state.name
 
-method update*(state:State, deltaTime: float32) =
+method update*(state: State, deltaTime: float32) =
   echo "Update in state ", state.name
 
-method start*(state:State) =
+method start*(state: State) =
   echo "Start state ", state.name
 
-method stop*(state:State)  =
+method stop*(state: State) =
   echo "Stop state ", state.name
 
-proc doClose(state: State) = 
+proc doClose(state: State) =
   ## Takes care of recursive close of all states
   # Close child state first
   if not state.subState.isNil:
     state.subState.doClose
   state.close
 
-proc doUpdate(state:State, deltaTime: float32) = 
+proc doUpdate(state: State, deltaTime: float32) =
   ## Takes care of correct updating everything
   if state.persistentUpdate or state.subState.isNil:
     state.update(deltaTime)
   if not state.subState.isNil:
     state.subState.update(deltaTime)
 
-proc closeSubState(parentState:State) =
+proc closeSubState(parentState: State) =
   if not parentState.subState.isNil:
     parentState.subState.doClose
 
-proc openSubState(parentState, subState:State) =
+proc openSubState(parentState, subState: State) =
   ## Opens substate (with closing if other is open)
   if not parentState.subState.isNil:
     parentState.subState.doClose
@@ -127,7 +132,6 @@ proc initGame*(windowWidth, windowHeight: int32, title: string) =
   else:
     raise newException(GameAlreadyCreated, "Game already created")
 
-
 proc title*(game: Game): string =
   return game.title
 
@@ -139,14 +143,13 @@ proc addCamera*(game: Game, x, y, scaleX, scaleY, rotation: float32): Camera =
   game.cameras.add(initCamera(x, y, scaleX, scaleY, rotation))
   return game.cameras[-1]
 
-proc openRootState*(game: Game, state:State) =
-
+proc openRootState*(game: Game, state: State) =
   if not game.state.isNil:
     game.state.doClose
   game.state = state
   state.start
 
-proc updateGame*(game:Game, deltaTime: float32) = 
+proc updateGame*(game: Game, deltaTime: float32) =
   #echo ("update - start")
   if not game.state.isNil:
     game.state.doUpdate(deltaTime)
