@@ -12,8 +12,10 @@ proc run*(game: Game, state: State) =
   game.openRootState(state)
   while not ray.windowShouldClose():
     game.updateGame(ray.getFrameTime())
+    game.updateTransforms
     ray.beginDrawing()
     ray.clearBackground(ray.DarkGray)
+    game.renderGame
     ray.endDrawing()
 
 

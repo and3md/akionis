@@ -69,7 +69,6 @@ type
     color: Color
     size: float32
 
-
   AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
     ## Raised after second try game creation 
@@ -78,6 +77,7 @@ type
     ## Trying to get a game instance but was not created
 
 var instance: Game
+const Red* = Color(r: 255, g: 0, b: 0, a: 255)
 
 proc getGame*(): Game =
   if instance.isNil:
@@ -85,13 +85,23 @@ proc getGame*(): Game =
   return instance
 
 # ---------------   RenderComponent   ----------------------
-method draw(comp: RenderedComponent) =
+method draw*(comp: RenderedComponent) =
   discard
 
 # ---------------   Square   ----------------------
-method draw(square: Square) =
+
+proc newSquare*(size: float32, color: Color): Square =
+  result = new(Square)
+  result.size = size
+  result.color = color
+
+method draw*(square: Square) =
   let data = decomposeMatrix(square.parent.worldMatrix)
-  ray.drawRectangle(ray.Rectangle(x: data.x, y: data.y, width: square.size, height: square.size), square.color)
+  echo "draw"
+  ray.drawRectangle(
+    ray.Rectangle(x: data.x, y: data.y, width: square.size, height: square.size),
+    square.color,
+  )
 
 # ---------------   Node   ----------------------
 
@@ -130,6 +140,13 @@ proc rotation*(node: Node, newRotation: float) =
   node.rotation = newRotation
   node.dirty = true
 
+proc addChild*(parentNode, newChild: Node) =
+  parentNode.children.add(newChild)
+
+proc addComponent*(node: Node, comp: Component) =
+  node.components.add(comp)
+  comp.parent = node
+
 proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
   ## Update this Node worldMatrix only when this node is dirty or parentDirty
   if isParentDirty or node.dirty:
@@ -139,6 +156,18 @@ proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
     for child in node.children:
       child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty)
     node.dirty = false
+
+proc render(node: Node) =
+  for comp in node.components:
+    if comp of RenderedComponent:
+      let renderComp = RenderedComponent(comp)
+      echo "rend"
+      renderComp.draw
+
+proc doRender(node: Node) =
+  node.render
+  for child in node.children:
+    child.doRender
 
 # ---------------   RootNode   ----------------------
 
@@ -157,6 +186,10 @@ proc initCamera*(x, y, scaleX, scaleY, rotation: float32): Camera =
   return Camera(x: x, y: y, scaleX: scaleY, rotation: rotation, dirty: true)
 
 # ---------------   State   ----------------------
+
+proc initState*(self: State, name: string) =
+  self.name = name
+  self.rootNode = new(RootNode)
 
 method close*(state: State) =
   echo "Close state ", state.name
@@ -195,6 +228,23 @@ proc openSubState(parentState, subState: State) =
   parentState.subState = subState
   subState.start
 
+proc doRender(state: State) =
+  if state.isNil:
+    return
+  state.rootNode.doRender()
+  if not state.subState.isNil:
+    doRender(state.subState)
+
+proc doUpdateTransform(state: State) =
+  if state.isNil:
+    return
+  if state.persistentUpdate or state.subState.isNil:
+    state.rootNode.updateAllTransforms
+  doUpdateTransform(state.subState)
+
+proc rootNode*(state: State): RootNode =
+  return state.rootNode
+
 # ---------------   Game   ----------------------
 
 proc initGame*(windowWidth, windowHeight: int32, title: string) =
@@ -226,3 +276,11 @@ proc updateGame*(game: Game, deltaTime: float32) =
   #echo ("update - start")
   if not game.state.isNil:
     game.state.doUpdate(deltaTime)
+
+proc updateTransforms*(game: Game) =
+  if not game.state.isNil:
+    game.state.doUpdateTransform
+
+proc renderGame*(game: Game) =
+  if not game.state.isNil:
+    game.state.doRender
