@@ -29,8 +29,8 @@ type
     id: CameraId
     x: float32
     y: float32
-    scaleX: float32
-    scaleY: float32
+    scaleX: float32 = 1.0
+    scaleY: float32 = 1.0
     rotation: float32
     dirty: bool = true ## Should we recalculate camera matrix
 
@@ -47,8 +47,8 @@ type
     worldMatrix: Matrix3
     x: float32
     y: float32
-    scaleX: float32
-    scaleY: float32
+    scaleX: float32 = 1.0
+    scaleY: float32 = 1.0
     rotation: float32
     dirty: bool = true ## Should we recalculate camera matrix
 
