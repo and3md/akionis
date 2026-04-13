@@ -4,7 +4,7 @@ import vmath
 type
   Matrix3* = GMat3[float32]    
 
-proc decomposeMatrix(
+proc decomposeMatrix*(
     matrix: Matrix3
 ): tuple[x: float32, y: float32, angle: float32, scaleX: float32, scaleY: float32] =
   result.x = matrix[2, 0]
