@@ -97,7 +97,6 @@ proc newSquare*(size: float32, color: Color): Square =
 
 method draw*(square: Square) =
   let data = decomposeMatrix(square.parent.worldMatrix)
-  echo "draw"
   ray.drawRectangle(
     ray.Rectangle(x: data.x, y: data.y, width: square.size, height: square.size),
     square.color,
@@ -161,7 +160,6 @@ proc render(node: Node) =
   for comp in node.components:
     if comp of RenderedComponent:
       let renderComp = RenderedComponent(comp)
-      echo "rend"
       renderComp.draw
 
 proc doRender(node: Node) =
