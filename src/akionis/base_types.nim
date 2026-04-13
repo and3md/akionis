@@ -106,7 +106,26 @@ proc rotation*(node: Node, newRotation: float) =
   node.rotation = newRotation
   node.dirty = true
 
+proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
+  ## Update this Node worldMatrix only when this node is dirty or parentDirty
+  if isParentDirty or node.dirty:
+    node.worldMatrix =
+      parentMatrix * rotate(node.rotation) * scale(vec2(node.scaleX, node.scaleY)) *
+      translate(vec2(node.x, node.y))
+    for child in node.children:
+      child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty)
+    node.dirty = false
 
+# ---------------   RootNode   ----------------------
+
+proc updateAllTransforms(node: RootNode) =
+  ## Updates world matricies with checking dirty flags
+  ## 
+  ## We need iterate all Nodes but not every matrix will be recalculated
+
+  # we use false and identity matrix on first level
+  # because this is checked in updateTransforms() proc
+  node.updateTransforms(mat3(), false)
 
 # ---------------   Camera   ----------------------
 
