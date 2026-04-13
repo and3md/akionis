@@ -51,45 +51,45 @@ type
     name: string
     enabled: bool
 
+  AkionisExcpetion* = object of CatchableError
+    ## Base Akionis exception
+  GameAlreadyCreated* = object of AkionisExcpetion
+    ## Raised after second try game creation 
+  NoGameInstance* = object of AkionisExcpetion
+    ## Trying to get a game instance but was not created
+
 var instance: Game
 
 proc getGame*(): Game =
   if instance.isNil:
-    raise newException(ValueError, "No game instance")
+    raise newException(NoGameInstance, "No game instance")
   return instance
 
-proc initGame*(windowWidth, windowHeight: int32, title: string) =
-  ## Initialises a new ``Game`` object.
-  if instance.isNil:
-    instance = Game(title: title)
-    ray.initWindow(windowWidth, windowHeight, title)
-  else:
-    raise newException(ValueError, "Game already created")
+# ---------------   Camera   ----------------------
+proc x*(node: Node):float32 =
+  return node.x
+
+proc `x=`*(node:Node, newX: float32) = 
+  node.x = newX
+  node.dirty = true
+
+# ---------------   Camera   ----------------------
 
 proc initCamera*(x, y, scaleX, scaleY, rotation: float32): Camera =
   return Camera(x: x, y: y, scaleX: scaleY, rotation: rotation, dirty: true)
 
-proc title*(game: Game): string =
-  return game.title
+# ---------------   State   ----------------------
 
-proc `title=`*(game: Game, newTitle: string) =
-  ray.setWindowTitle(newTitle)
-  game.title = newTitle
-
-proc addCamera*(game: Game, x, y, scaleX, scaleY, rotation: float32): Camera =
-  game.cameras.add(initCamera(x, y, scaleX, scaleY, rotation))
-  return game.cameras[-1]
-
-method close*(state:State) {.base.} = 
+method close*(state:State) = 
   echo "Close state ", state.name
 
-method update*(state:State, deltaTime: float32) {.base.} =
+method update*(state:State, deltaTime: float32) =
   echo "Update in state ", state.name
 
-method start*(state:State) {.base.} =
+method start*(state:State) =
   echo "Start state ", state.name
 
-method stop*(state:State) {.base.} =
+method stop*(state:State)  =
   echo "Stop state ", state.name
 
 proc doClose(state: State) = 
@@ -117,7 +117,27 @@ proc openSubState(parentState, subState:State) =
   parentState.subState = subState
   subState.start
 
-# ---------------   Game ----------------------
+# ---------------   Game   ----------------------
+
+proc initGame*(windowWidth, windowHeight: int32, title: string) =
+  ## Initialises a new ``Game`` object.
+  if instance.isNil:
+    instance = Game(title: title)
+    ray.initWindow(windowWidth, windowHeight, title)
+  else:
+    raise newException(GameAlreadyCreated, "Game already created")
+
+
+proc title*(game: Game): string =
+  return game.title
+
+proc `title=`*(game: Game, newTitle: string) =
+  ray.setWindowTitle(newTitle)
+  game.title = newTitle
+
+proc addCamera*(game: Game, x, y, scaleX, scaleY, rotation: float32): Camera =
+  game.cameras.add(initCamera(x, y, scaleX, scaleY, rotation))
+  return game.cameras[-1]
 
 proc openRootState*(game: Game, state:State) =
 
