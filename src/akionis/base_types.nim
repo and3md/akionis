@@ -4,6 +4,8 @@ import matrices
 from raylib as ray import nil
 
 type
+  Color = ray.Color
+
   Game* = ref object of RootObj
     cameras: seq[Camera]
     lastCameraId: Option[CameraId]
@@ -56,6 +58,17 @@ type
   Component* = ref object of RootObj
     name: string
     enabled: bool
+    parent: Node
+
+  RenderedComponent* = ref object of Component
+    cameras: CameraMask
+    offsetX: float32
+    offsetY: float32
+
+  Square* = ref object of RenderedComponent
+    color: Color
+    size: float32
+
 
   AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
@@ -70,6 +83,15 @@ proc getGame*(): Game =
   if instance.isNil:
     raise newException(NoGameInstance, "No game instance")
   return instance
+
+# ---------------   RenderComponent   ----------------------
+method draw(comp: RenderedComponent) =
+  discard
+
+# ---------------   Square   ----------------------
+method draw(square: Square) =
+  let data = decomposeMatrix(square.parent.worldMatrix)
+  ray.drawRectangle(ray.Rectangle(x: data.x, y: data.y, width: square.size, height: square.size), square.color)
 
 # ---------------   Node   ----------------------
 
