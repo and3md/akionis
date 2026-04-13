@@ -41,7 +41,7 @@ type
     children: seq[Node]
     parent: Node
     components: seq[Component]
-    matrix: Matrix3
+    worldMatrix: Matrix3
     x: float32
     y: float32
     scaleX: float32
