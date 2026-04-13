@@ -32,12 +32,16 @@ type
   Camera* = ref object of RootObj
     matrix: Matrix3
     id: CameraId
-    x: float32
-    y: float32
+    viewport: Rectangle
+    texture: ray.RenderTexture2D ## Should have viewport size
+    worldX: float32 ## World pos x 
+    worldY: float32 ## World pos x
     scaleX: float32 = 1.0
     scaleY: float32 = 1.0
     rotation: float32
-    dirty: bool = true ## Should we recalculate camera matrix
+    isActive*: bool = true
+    isDirty: bool = true ## Should we recalculate camera matrix
+    isFullScreen: bool = true ## When true don't use viewport
 
   State* = ref object of RootObj
     name*: string ## State name - no special meaning only for identification
@@ -80,6 +84,8 @@ type
 
   NoGameInstance* = object of AkionisExcpetion
     ## Trying to get a game instance but was not created
+
+  ToManyCameras* = object of AkionisExcpetion
 
 var instance: Game
 
@@ -212,8 +218,29 @@ proc updateAllTransforms(node: RootNode) =
 
 # ---------------   Camera   ----------------------
 
-proc initCamera*(x, y, scaleX, scaleY, rotation: float32): Camera =
-  return Camera(x: x, y: y, scaleX: scaleY, rotation: rotation, dirty: true)
+proc newCamera*(worldX, worldY: float32): Camera =
+  result = Camera(
+    worldX: worldX,
+    worldY: worldY,
+    scaleX: 1.0,
+    scaleY: 1.0,
+    rotation: 0,
+    isDirty: true,
+    isActive: true,
+  )
+  result.isFullScreen = true
+  result.texture = ray.loadRenderTexture(ray.getRenderWidth(), ray.getRenderHeight())
+
+proc updateCameraTransform(cam: Camera) =
+  cam.matrix =
+    translate(vec2(cam.worldX, cam.worldY)) * rotate(-cam.rotation) *
+    scale(vec2(cam.scaleX, cam.scaleY))
+  cam.isDirty = false
+
+proc resizeCameraTexture(cam: Camera, newSize: Size) =
+  if cam.texture.texture.width == newSize.width and
+      cam.texture.texture.height == newSize.height:
+    return
 
 # ---------------   State   ----------------------
 
@@ -277,11 +304,30 @@ proc rootNode*(state: State): RootNode =
 
 # ---------------   Game   ----------------------
 
-proc initGame*(windowWidth, windowHeight: int32, title: string) =
+proc addFullScreenCamera*(game: Game, worldX, worldY: float32): Camera =
+  ## Adds full screen camera that points to worldX, worldY in left top corrner
+  var camera = newCamera(worldX, worldY)
+  if game.lastCameraId.isNone:
+    camera.id = Camera1
+    game.lastCameraId = option(Camera1)
+  else:
+    if game.lastCameraId.get == high(CameraId):
+      raise newException(ToManyCameras, "To many cameras")
+    camera.id = succ(game.lastCameraId.get())
+    game.lastCameraId = option(camera.id)
+  game.cameras.add(camera)
+  return camera
+
+proc initGame*(
+    windowWidth, windowHeight: int32, title: string, addDefaultCamera: bool = true
+) =
   ## Initialises a new ``Game`` object.
   if instance.isNil:
     instance = Game(title: title)
+    ray.setConfigFlags(ray.Flags[ray.ConfigFlags](ray.WindowResizable))
     ray.initWindow(windowWidth, windowHeight, title)
+    if addDefaultCamera:
+      discard instance.addFullScreenCamera(0.0, 0.0)
   else:
     raise newException(GameAlreadyCreated, "Game already created")
 
@@ -291,10 +337,6 @@ proc title*(game: Game): string =
 proc `title=`*(game: Game, newTitle: string) =
   ray.setWindowTitle(newTitle)
   game.title = newTitle
-
-proc addCamera*(game: Game, x, y, scaleX, scaleY, rotation: float32): Camera =
-  game.cameras.add(initCamera(x, y, scaleX, scaleY, rotation))
-  return game.cameras[-1]
 
 proc openRootState*(game: Game, state: State) =
   if not game.state.isNil:
@@ -310,7 +352,17 @@ proc updateGame*(game: Game, deltaTime: float32) =
 proc updateTransforms*(game: Game) =
   if not game.state.isNil:
     game.state.doUpdateTransform
+  for cam in game.cameras:
+    if cam.isActive and cam.isDirty:
+      cam.updateCameraTransform
 
 proc renderGame*(game: Game) =
   if not game.state.isNil:
     game.state.doRender
+
+proc doResize(game: Game) =
+  for cam in game.cameras:
+    if cam.isFullScreen:
+      cam.resizeCameraTexture(
+        Size(width: ray.getRenderWidth(), height: ray.getRenderHeight())
+      )
