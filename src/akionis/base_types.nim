@@ -104,6 +104,24 @@ method draw*(square: Square) =
 
 # ---------------   Node   ----------------------
 
+proc initNode*(self: Node, x, y, scaleX, scaleY, rot: float32) =
+  self.x = x
+  self.y = y
+  self.scaleX = scaleX
+  self.scaleY = scaleY
+  self.rotation = rot
+
+proc initNode*(self: Node, x, y: float32) =
+  initNode(self, x, y, 1.0, 1.0, 0.0)
+
+proc newNode*(x, y: float): Node =
+  result = new(Node)
+  initNode(result, x, y)
+
+proc newNode*(x, y, scaleX, scaleY, rot: float32): Node =
+  result = new(Node)
+  initNode(result, x, y, scaleX, scaleY, rot)
+
 proc x*(node: Node): float32 =
   return node.x
 
