@@ -100,7 +100,14 @@ method draw*(square: Square) =
     square.parent.worldMatrix * translate(vec2(square.offsetX, square.offsetY))
   )
   ray.drawRectangle(
-    ray.Rectangle(x: data.x, y: data.y, width: square.size, height: square.size),
+    ray.Rectangle(
+      x: data.x,
+      y: data.y,
+      width: square.size * data.scaleX,
+      height: square.size * data.scaleY,
+    ),
+    ray.Vector2(x: 0.0, y: 0.0),
+    radToDeg(data.angle),
     square.color,
   )
 
@@ -170,8 +177,9 @@ proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
   ## Update this Node worldMatrix only when this node is dirty or parentDirty
   if isParentDirty or node.dirty:
     node.worldMatrix =
-      parentMatrix * rotate(node.rotation) * scale(vec2(node.scaleX, node.scaleY)) *
-      translate(vec2(node.x, node.y))
+      parentMatrix * translate(vec2(node.x, node.y)) * rotate(-node.rotation) *
+      scale(vec2(node.scaleX, node.scaleY))
+
     for child in node.children:
       child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty)
     node.dirty = false
