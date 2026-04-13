@@ -30,7 +30,7 @@ type
     scaleX: float32
     scaleY: float32
     rotation: float32
-    dirty: bool ## Should we recalculate camera matrix
+    dirty: bool = true ## Should we recalculate camera matrix
 
   State* = ref object of RootObj
     name*: string
@@ -48,7 +48,7 @@ type
     scaleX: float32
     scaleY: float32
     rotation: float32
-    dirty: bool ## Should we recalculate camera matrix
+    dirty: bool = true ## Should we recalculate camera matrix
 
   RootNode* = ref object of Node
     parentState: State
