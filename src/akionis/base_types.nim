@@ -72,7 +72,7 @@ type
     parent: Node
 
   RenderedComponent* = ref object of Component
-    cameras: CameraMask
+    cameras: CameraMask = {Camera1}
     offsetX*: float32
     offsetY*: float32
 
