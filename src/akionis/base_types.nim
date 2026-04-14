@@ -357,7 +357,7 @@ proc `title=`*(game: Game, newTitle: string) =
 
 proc getDefaultCamera*(game: Game): Camera =
   if game.cameras.len == 0:
-    discard game.addFullScreenCamera(0.0,0.0)
+    discard game.addFullScreenCamera(0.0, 0.0)
 
   return game.cameras[0]
 
@@ -393,6 +393,6 @@ proc doResize*(game: Game) =
         Size(width: ray.getRenderWidth(), height: ray.getRenderHeight())
       )
 
-iterator getCameras*(game:Game): Camera =
+iterator getCameras*(game: Game): Camera =
   for cam in game.cameras:
     yield cam
