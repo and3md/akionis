@@ -264,6 +264,31 @@ proc renderWithAllCameras(node: RootNode) =
 
 # ---------------   Camera   ----------------------
 
+proc `worldX=`*(cam: Camera, newWorldX: float32) =
+  cam.worldX = newWorldX
+  cam.isDirty = true
+
+proc `worldY=`*(cam: Camera, newWorldY: float32) =
+  cam.worldY = newWorldY
+  cam.isDirty = true
+
+proc `rotation=`*(cam: Camera, newRotation: float32) =
+  cam.rotation = newRotation
+  cam.isDirty = true
+
+proc `scaleX=`*(cam: Camera, newScale: float32) =
+  cam.scaleX = newScale
+  cam.isDirty = true
+
+proc `scaleY=`*(cam: Camera, newScale: float32) =
+  cam.scaleY = newScale
+  cam.isDirty = true
+
+proc `scale=`*(cam: Camera, newScale: float32) =
+  cam.scaleX = newScale
+  cam.scaleY = newScale
+  cam.isDirty = true
+
 proc newCamera*(worldX, worldY: float32): Camera =
   result = Camera(
     worldX: worldX,
@@ -300,8 +325,9 @@ proc resetViewport*(cam: Camera) =
 
 proc updateCameraTransform(cam: Camera) =
   cam.matrix =
-    translate(vec2(-cam.worldX, -cam.worldY)) * rotate(cam.rotation) *
-    scale(vec2(cam.scaleX, cam.scaleY))
+    scale(vec2(cam.scaleX, cam.scaleY)) * rotate(cam.rotation) *
+     translate(vec2(-cam.worldX, -cam.worldY))
+    
   cam.isDirty = false
 
 # ---------------   State   ----------------------
