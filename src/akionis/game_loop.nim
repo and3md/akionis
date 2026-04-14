@@ -8,16 +8,15 @@ import base_types
 
 proc run*(game: Game, state: State) =
   ## Runs the game loop 
-  
+
   game.openRootState(state)
   while not ray.windowShouldClose():
     if game.wasResize():
       game.doResize()
     game.updateGame(ray.getFrameTime())
     game.updateTransforms
+    game.renderGameToTexture
     ray.beginDrawing()
     ray.clearBackground(ray.DarkGray)
     game.renderGame
     ray.endDrawing()
-
-

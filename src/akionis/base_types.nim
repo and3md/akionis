@@ -16,6 +16,7 @@ type
     lastCameraId: Option[CameraId]
     state: State
     title: string
+    screenTexture: ray.RenderTexture2D
 
   CameraId* = enum
     Camera1
@@ -224,7 +225,37 @@ proc updateAllTransforms(node: RootNode) =
 proc renderWithAllCameras(node: RootNode) =
   for cam in node.parentState.game.cameras:
     if cam.isActive:
+      ray.beginTextureMode(cam.texture)
       node.doRender(cam)
+      ray.endTextureMode()
+
+  ray.beginTextureMode(node.parentState.game.screenTexture)
+  # TODO: camera effects here
+  for cam in node.parentState.game.cameras:
+    if cam.isActive:
+      #echo "rys"
+      ray.drawTexture(
+        cam.texture.texture,
+        Rectangle(
+          x: 0'f32,
+          y: 0'f32,
+          width: cam.texture.texture.width.float32,
+          height: cam.texture.texture.height.float32,
+        ),
+        if cam.isFullScreen:
+          Rectangle(
+            x: 0'f32,
+            y: 0'f32,
+            width: cam.texture.texture.width.float32,
+            height: cam.texture.texture.height.float32,
+          )
+        else:
+          cam.viewport,
+        ray.Vector2(x: 0'f32, y: 0'f32),
+        0'f32,
+        White,
+      )
+  ray.endTextureMode()
 
 # ---------------   Camera   ----------------------
 
@@ -357,6 +388,8 @@ proc initGame*(
     instance = Game(title: title)
     ray.setConfigFlags(ray.Flags[ray.ConfigFlags](ray.WindowResizable))
     ray.initWindow(windowWidth, windowHeight, title)
+    instance.screenTexture =
+      ray.loadRenderTexture(ray.getRenderWidth(), ray.getRenderHeight())
     if addDefaultCamera:
       discard instance.addFullScreenCamera(0.0, 0.0)
   else:
@@ -393,19 +426,42 @@ proc updateTransforms*(game: Game) =
     if cam.isActive and cam.isDirty:
       cam.updateCameraTransform
 
-proc renderGame*(game: Game) =
+proc renderGameToTexture*(game: Game) =
   if not game.state.isNil:
     game.state.doRender
+
+proc renderGame*(game: Game) =
+  ## Renders game screen texture to screen
+  # TODO: ascpect ratio, screen effects, etc here
+  ray.drawTexture(
+    game.screenTexture.texture,
+    Rectangle(
+      x: 0'f32,
+      y: 0'f32,
+      width: game.screenTexture.texture.width.float32,
+      height: game.screenTexture.texture.height.float32,
+    ),
+    Rectangle(
+      x: 0'f32,
+      y: 0'f32,
+      width: ray.getRenderWidth().float32,
+      height: ray.getRenderHeight().float32,
+    ),
+    ray.Vector2(x: 0'f32, y: 0'f32),
+    0'f32,
+    White,
+  )
 
 proc wasResize*(game: Game): bool =
   return ray.isWindowResized()
 
 proc doResize*(game: Game) =
+  let w = ray.getRenderWidth()
+  let h = ray.getRenderHeight()
+  instance.screenTexture = ray.loadRenderTexture(w, h)
   for cam in game.cameras:
     if cam.isFullScreen:
-      cam.resizeCameraTexture(
-        Size(width: ray.getRenderWidth(), height: ray.getRenderHeight())
-      )
+      cam.resizeCameraTexture(Size(width: w, height: h))
 
 iterator getCameras*(game: Game): Camera =
   for cam in game.cameras:
