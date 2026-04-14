@@ -241,11 +241,8 @@ proc newCamera*(worldX, worldY: float32): Camera =
   result.isFullScreen = true
   result.texture = ray.loadRenderTexture(ray.getRenderWidth(), ray.getRenderHeight())
 
-proc updateCameraTransform(cam: Camera) =
-  cam.matrix =
-    translate(vec2(cam.worldX, cam.worldY)) * rotate(-cam.rotation) *
-    scale(vec2(cam.scaleX, cam.scaleY))
-  cam.isDirty = false
+proc viewport*(cam: Camera): Rectangle =
+  return cam.viewport
 
 proc resizeCameraTexture(cam: Camera, newSize: Size) =
   echo "resize camera texture"
@@ -253,6 +250,23 @@ proc resizeCameraTexture(cam: Camera, newSize: Size) =
       cam.texture.texture.height == newSize.height:
     return
   cam.texture = ray.loadRenderTexture(newSize.width, newSize.height)
+
+proc `viewport=`*(cam: Camera, newViewport: Rectangle) =
+  echo "setting wievport"
+  cam.viewport = newViewport
+  cam.isFullScreen = false
+  cam.resizeCameraTexture(
+    Size(width: newViewport.width.int32, height: newViewport.height.int32)
+  )
+
+proc resetViewport*(cam: Camera) =
+  cam.isFullScreen = true
+
+proc updateCameraTransform(cam: Camera) =
+  cam.matrix =
+    translate(vec2(cam.worldX, cam.worldY)) * rotate(-cam.rotation) *
+    scale(vec2(cam.scaleX, cam.scaleY))
+  cam.isDirty = false
 
 # ---------------   State   ----------------------
 
