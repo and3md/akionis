@@ -53,6 +53,9 @@ proc `rotation=`*(node: Node, newRotation: float) =
   node.rotation = newRotation
   node.dirty = true
 
+proc worldMatrix*(node: Node): Matrix3 =
+  return node.worldMatrix
+
 proc addChild*(parentNode, newChild: Node) =
   parentNode.children.add(newChild)
 
@@ -82,3 +85,4 @@ proc doRender(node: Node, camera: Camera) =
   node.render(camera)
   for child in node.children:
     child.doRender(camera)
+

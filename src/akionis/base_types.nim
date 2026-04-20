@@ -83,12 +83,16 @@ type
 
   ToManyCameras* = object of AkionisExcpetion
 
+  NoParentNode* = object of AkionisExcpetion
+    ## When you try use component function that need parent
+
 var instance: Game
 
 # Base type's procs and methods are included from their files
 
 include base_camera
 
+include base_component
 include base_render_component
 
 include base_node

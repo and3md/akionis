@@ -18,7 +18,7 @@ proc decomposeMatrix*(
   result.scaleX = vec2(matrix[0, 0], matrix[0, 1]).length
   result.scaleY = vec2(matrix[1, 0], matrix[1, 1]).length
 
-proc globalRectFromVec3(worldMatrix: Matrix3, p1, p2, p3, p4: Vector3): Rect =
+proc globalRectFromVec3*(worldMatrix: Matrix3, p1, p2, p3, p4: Vector3): Rect =
   let world_p1 = worldMatrix * p1
   let world_p2 = worldMatrix * p2
   let world_p3 = worldMatrix * p3

@@ -18,3 +18,13 @@ proc decomposedTransform*(comp: RenderedComponent, cam: Camera
   return decomposeMatrix(
     cam.matrix * comp.parent.worldMatrix * translate(vec2(comp.offsetX, comp.offsetY))
   )
+
+method worldBoundingBox*(comp: RenderedComponent): Rect =
+  let parent = comp.parent
+  if parent.isNil:
+    raise newException(NoParentNode, "Can't calculate world bounding box without parent Node")
+  let world_p1 = parent.worldMatrix * vec3(comp.offsetX, comp.offsetY, 1'f32)
+  result.x = world_p1.x
+  result.y = world_p1.y
+  result.width = 0
+  result.height = 0
