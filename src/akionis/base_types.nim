@@ -190,10 +190,17 @@ proc rectInCamera(cam: Camera, rect: var Rect) =
 
 # Component ------------------------------------------------
 
+proc initComponent*(comp: Component, name: string) =
+  comp.enabled = true
+  comp.name = name
+
 proc parent*(comp: Component): Node =
   return comp.parent
 
 # RenderedComponent ----------------------------------------
+
+proc initRenderedComponent*(comp: RenderedComponent, name: string) =
+  initComponent(comp, name)
 
 method draw*(comp: RenderedComponent, camera: Camera) =
   ## Draw function to override
@@ -426,7 +433,7 @@ proc renderWithAllCameras(node: RootNode) =
         White,
       )
   ray.endTextureMode()
-
+  
 # State ----------------------------------------------------
 
 proc initState*(self: State, game: Game, name: string) =
