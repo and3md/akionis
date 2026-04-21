@@ -65,8 +65,8 @@ type
     parentState: State
 
   Component* = ref object of RootObj
-    name: string
-    enabled: bool
+    name*: string
+    enabled*: bool
     parent: Node
 
   RenderedComponent* = ref object of Component
