@@ -209,14 +209,21 @@ proc updateCameraTransform(cam: Camera) =
 
   cam.isDirty = false
 
-proc rectInCamera(cam: Camera, rect: var Rect) =
+proc rectInCamera(cam: Camera, rect: var Rect): OrientedRect =
   ## Transforms rect for camera view, used by drawing bounding boxes
-  let pos = cam.matrix * vec3(rect.x, rect.y, 1'f32)
-  let size = cam.matrix * vec3(rect.x + rect.width, rect.y + rect.height, 1'f32)
-  rect.x = pos.x
-  rect.y = pos.y
-  rect.width = size.x - rect.x
-  rect.height = size.y - rect.y
+  let c1 = cam.matrix * vec3(rect.x, rect.y, 1'f32)
+  let c2 = cam.matrix * vec3(rect.x + rect.width, rect.y, 1'f32)
+  let c3 = cam.matrix * vec3(rect.x + rect.width, rect.y + rect.height, 1'f32)
+  let c4 = cam.matrix * vec3(rect.x, rect.y + rect.height, 1'f32)
+  result.corners[0].x = c1.x
+  result.corners[0].y = c1.y
+  result.corners[1].x = c2.x
+  result.corners[1].y = c2.y
+  result.corners[2].x = c3.x
+  result.corners[2].y = c3.y
+  result.corners[3].x = c4.x
+  result.corners[3].y = c4.y
+
 
 # Component ------------------------------------------------
 
