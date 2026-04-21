@@ -73,12 +73,11 @@ type
     cameras: CameraMask = {Camera1}
     offsetX*: float32
     offsetY*: float32
-
   
-  ScriptComponent = ref object of Component
+  ScriptComponent* = ref object of Component
     ## Component that runs update method
 
-  ClosureComponent = ref object of Component
+  ClosureComponent* = ref object of Component
     ## Component that runs onUpdate callback
     onUpdate*: proc(self: ClosureComponent, deltaTime: float)
 
