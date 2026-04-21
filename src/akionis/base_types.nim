@@ -54,12 +54,13 @@ type
     parent: Node
     components: seq[Component]
     worldMatrix: Matrix3
+    cachedWorldBoundingBox: Rect
     x: float32
     y: float32
     scaleX: float32 = 1.0
     scaleY: float32 = 1.0
     rotation: float32
-    dirty: bool = true ## Should we recalculate camera matrix
+    dirty: bool = true ## Should we recalculate world matrix
 
   RootNode* = ref object of Node
     parentState: State
@@ -309,18 +310,7 @@ proc addComponent*(node: Node, comp: Component) =
   node.components.add(comp)
   comp.parent = node
 
-proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool) =
-  ## Update this Node worldMatrix only when this node is dirty or parentDirty
-  if isParentDirty or node.dirty:
-    node.worldMatrix =
-      parentMatrix * translate(vec2(node.x, node.y)) * rotate(-node.rotation) *
-      scale(vec2(node.scaleX, node.scaleY))
-
-  for child in node.children:
-    child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty)
-  node.dirty = false
-
-method worldBoundingBox*(node: Node): Rect =
+method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
   for comp in node.components:
     if comp of RenderedComponent:
@@ -331,10 +321,30 @@ method worldBoundingBox*(node: Node): Rect =
         wasFirst = true
   for child in node.children:
     if wasFirst:
-      result = rectMerge(result, child.worldBoundingBox)
+      result = rectMerge(result, child.calculateWorldBoundingBox)
     else:
-      result = child.worldBoundingBox
+      result = child.calculateWorldBoundingBox
       wasFirst = true
+
+proc worldBoundingBox*(node:Node): Rect =
+  return node.cachedWorldBoundingBox
+
+proc updateTransforms(node: Node, parentMatrix: Matrix3, isParentDirty: bool): bool =
+  ## Update this Node worldMatrix only when this node is dirty or parentDirty
+  ## Returns true when something changes
+  if isParentDirty or node.dirty:
+    node.worldMatrix =
+      parentMatrix * translate(vec2(node.x, node.y)) * rotate(-node.rotation) *
+      scale(vec2(node.scaleX, node.scaleY))
+
+  result = isParentDirty or node.dirty
+  for child in node.children:
+    if child.updateTransforms(node.worldMatrix, isParentDirty or node.dirty):
+      result = true
+  # When result is true we need update cached WorldBoundingBox
+  if result:
+    node.cachedWorldBoundingBox = node.calculateWorldBoundingBox
+  node.dirty = false
 
 proc drawComponentsBoundingBoxes*(node: Node, camera: Camera) =
   for comp in node.components:
@@ -394,7 +404,7 @@ proc updateAllTransforms(node: RootNode) =
 
   # we use false and identity matrix on first level
   # because this is checked in updateTransforms() proc
-  node.updateTransforms(mat3(), false)
+  discard node.updateTransforms(mat3(), false)
 
 proc renderWithAllCameras(node: RootNode) =
   for cam in node.parentState.game.cameras:
