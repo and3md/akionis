@@ -319,6 +319,16 @@ proc drawComponentsAndChildrenBoundingBoxes*(node: Node, camera: Camera) =
   for child in node.children:
     child.drawComponentsBoundingBoxes(camera)
 
+proc drawNodeBoundingBox*(node: Node, camera: Camera) =
+  var nodeBoundingBox = node.worldBoundingBox
+  camera.rectInCamera(nodeBoundingBox)
+  ray.drawRectangleLines(nodeBoundingBox, 1'f32, Magenta)
+
+proc drawNodeAndChildrenBoundingBoxes*(node: Node, camera: Camera) = 
+  drawNodeBoundingBox(node, camera)
+  for child in node.children:
+    drawNodeAndChildrenBoundingBoxes(child, camera)
+
 proc render(node: Node, camera: Camera) =
   for comp in node.components:
     if comp of RenderedComponent:
@@ -327,6 +337,8 @@ proc render(node: Node, camera: Camera) =
         renderComp.draw(camera)
   when defined(drawComponentsBoundingBoxes):
     node.drawComponentsAndChildrenBoundingBoxes(camera)
+  when defined(drawNodesBoundingBoxes):
+    node.drawNodeBoundingBox(camera)
 
 proc doRender(node: Node, camera: Camera) =
   node.render(camera)
