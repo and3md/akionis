@@ -332,7 +332,7 @@ proc drawNodeBoundingBox*(node: Node, camera: Camera) =
   camera.rectInCamera(nodeBoundingBox)
   ray.drawRectangleLines(nodeBoundingBox, 1'f32, Magenta)
 
-proc drawNodeAndChildrenBoundingBoxes*(node: Node, camera: Camera) = 
+proc drawNodeAndChildrenBoundingBoxes*(node: Node, camera: Camera) =
   drawNodeBoundingBox(node, camera)
   for child in node.children:
     drawNodeAndChildrenBoundingBoxes(child, camera)
