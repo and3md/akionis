@@ -316,7 +316,6 @@ method worldBoundingBox*(node: Node): Rect =
     else:
       result = child.worldBoundingBox
       wasFirst = true
-  echo "node worldBoundingBox ", result
 
 proc drawComponentsBoundingBoxes*(node: Node, camera: Camera) =
   for comp in node.components:
