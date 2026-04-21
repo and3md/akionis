@@ -42,6 +42,11 @@ proc isRectEmpty*(rect: Rect): bool =
   return isZero(rect.width) and isZero(rect.height)
 
 proc rectMerge*(rect1, rect2: Rect):Rect =
+  ## Merges rect if one of rects is empty ignores him
+  if isRectEmpty(rect1):
+    return rect2
+  if isRectEmpty(rect2):
+    return rect1
   let r1x2 = rect1.x + rect1.width
   let r1y2 = rect1.y + rect1.height
   let r2x2 = rect2.x + rect2.width
