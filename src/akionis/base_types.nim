@@ -74,6 +74,14 @@ type
     offsetX*: float32
     offsetY*: float32
 
+  
+  ScriptComponent = ref object of Component
+    ## Component that runs update method
+
+  ClosureComponent = ref object of Component
+    ## Component that runs onUpdate callback
+    onUpdate*: proc(self: ClosureComponent, deltaTime: float)
+
   AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
     ## Raised after second try game creation 
@@ -225,6 +233,11 @@ proc drawBoundingBox*(comp: RenderedComponent, camera: Camera) =
 
   ray.drawRectangleLines(rect, 1'f32, Yellow)
 
+# ScriptComponent -----------------------------------------
+
+method update(self: ScriptComponent, deltaTime: float32) =
+  discard
+
 # Node -----------------------------------------------------
 
 proc initNode*(self: Node, x, y, scaleX, scaleY, rot: float32) =
@@ -353,6 +366,19 @@ proc doRender(node: Node, camera: Camera) =
   for child in node.children:
     child.doRender(camera)
 
+proc doUpdate(node: Node, deltaTime: float) = 
+  for comp in node.components:
+    if not comp.enabled:
+      continue
+    if comp of ScriptComponent:
+      update(ScriptComponent(comp), deltaTime)
+    elif comp of ClosureComponent:
+      let closureComp = ClosureComponent(comp)
+      if not closureComp.onUpdate.isNil:
+        closureComp.onUpdate(closureComp, deltaTime)
+  for child in node.children:
+    child.doUpdate(deltaTime)
+
 # RootNode -------------------------------------------------
 
 proc updateAllTransforms(node: RootNode) =
@@ -432,8 +458,10 @@ proc doUpdate(state: State, deltaTime: float32) =
   ## Takes care of correct updating everything
   if state.persistentUpdate or state.subState.isNil:
     state.update(deltaTime)
+    state.rootNode.doUpdate(deltaTime)
   if not state.subState.isNil:
     state.subState.update(deltaTime)
+    state.subState.rootNode.doUpdate(deltaTime)
 
 proc closeSubState(parentState: State) =
   if not parentState.subState.isNil:
