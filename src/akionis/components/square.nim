@@ -8,10 +8,17 @@ type Square* = ref object of RenderedComponent
   color*: Color
   size*: float32
 
-proc newSquare*(size: float32, color: Color): Square =
+var lastSquare: uint64 = 0
+
+proc newSquare*(name: string, size: float32, color: Color): Square =
   result = new(Square)
+  initRenderedComponent(result, name)
   result.size = size
   result.color = color
+
+proc newSquare*(size: float32, color: Color): Square =
+  inc lastSquare
+  result = newSquare("Square " & $lastSquare, size, color)
 
 method draw*(square: Square, camera: Camera) =
   let data = square.decomposedTransform(camera)
