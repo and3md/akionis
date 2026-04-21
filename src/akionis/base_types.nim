@@ -30,8 +30,10 @@ type
 
   Camera* = ref object of RootObj
     matrix: Matrix3
+    invMatrix: Matrix3 ## Needed to calculate world pos from screen pos
     id: CameraId
     viewport: Rect
+    visibleWorldRect: Rect ## world rect visible in the camera
     texture: ray.RenderTexture2D ## Should have viewport size
     worldX: float32 ## World pos x 
     worldY: float32 ## World pos x
@@ -176,6 +178,36 @@ proc updateCameraTransform(cam: Camera) =
   cam.matrix =
     scale(vec2(cam.scaleX, cam.scaleY)) * rotate(cam.rotation) *
     translate(vec2(-cam.worldX, -cam.worldY))
+
+  cam.invMatrix = inverse(cam.matrix)
+
+  let topLeftCorner =
+    if cam.isFullScreen:
+      cam.invMatrix * vec3(0'f32, 0'f32, 1'f32)
+    else:
+      cam.invMatrix * vec3(cam.viewport.x, cam.viewport.y, 1'f32)
+
+  let bottomRightCorner =
+    if cam.isFullScreen:
+      cam.invMatrix *
+        vec3(
+          cam.texture.texture.width.float32, cam.texture.texture.height.float32, 1'f32
+        )
+    else:
+      cam.invMatrix *
+        vec3(
+          cam.viewport.x + cam.viewport.width,
+          cam.viewport.y + cam.viewport.height,
+          1'f32,
+        )
+
+  # TODO: camera rotation support ???
+  cam.visibleWorldRect.x = topLeftCorner.x
+  cam.visibleWorldRect.y = topLeftCorner.y
+  cam.visibleWorldRect.width = bottomRightCorner.x - topLeftCorner.x
+  cam.visibleWorldRect.height = bottomRightCorner.y - topLeftCorner.y
+  echo "visible world in camera", cam.visibleWorldRect
+  echo "viewport 0, 0 ", cam.texture.texture.width, ", ", cam.texture.texture.height
 
   cam.isDirty = false
 
