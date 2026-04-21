@@ -147,8 +147,8 @@ proc viewport*(cam: Camera): Rect =
   return cam.viewport
 
 proc resizeCameraTexture(cam: Camera, newSize: Size) =
-  echo "resize camera texture"
-  if cam.texture.id != 0 and cam.texture.texture.width == newSize.width and
+  if ray.isTextureValid(cam.texture.texture) and
+      cam.texture.texture.width == newSize.width and
       cam.texture.texture.height == newSize.height:
     return
   cam.texture = ray.loadRenderTexture(newSize.width, newSize.height)
