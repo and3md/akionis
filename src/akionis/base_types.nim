@@ -395,6 +395,8 @@ proc addChild*(parentNode, newChild: Node) =
 proc addComponent*(node: Node, comp: Component) =
   node.components.add(comp)
   comp.parent = node
+  if comp.isEnabled and comp of RenderedComponent:
+    node.isDirty = true
 
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
