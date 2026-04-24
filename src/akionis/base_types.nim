@@ -226,13 +226,20 @@ proc updateCameraTransform(cam: Camera) =
       Vector2(x: topLeftCorner.x, y: topLeftCorner.y),
       Vector2(x: topRightCorner.x, y: topRightCorner.y),
       Vector2(x: bottomLeftCorner.x, y: bottomLeftCorner.y),
-      Vector2(x: bottomRightCorner.x, y: bottomRightCorner.y)
+      Vector2(x: bottomRightCorner.x, y: bottomRightCorner.y),
     )
 
-  echo "screen size: ", ray.getRenderWidth(), ", ", ray.getRenderHeight()
-  echo "visible world in camera :", cam.visibleWorldRect
-  echo "viewport 0, 0 ", cam.texture.texture.width, ", ", cam.texture.texture.height
+  echo "Camera transform update:"
+  echo "Screen size: ", ray.getRenderWidth(), ", ", ray.getRenderHeight()
+  echo "Visible world in camera: ", cam.visibleWorldRect
+  if cam.isFullScreen:
+    echo "Viewport: 0, 0 ", cam.texture.texture.width, ", ", cam.texture.texture.height
+  else:
+    echo "Viewport: ",
+      cam.viewport.x, ", ", cam.viewport.y, ", ", cam.viewport.width, ", ",
+      cam.viewport.height
 
+  # After update camera is no longer dirty
   cam.isDirty = false
 
 proc rectInCamera(cam: Camera, rect: var Rect): OrientedRect =
