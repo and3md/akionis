@@ -6,7 +6,7 @@ from raylib as ray import nil
 
 type Square* = ref object of RenderedComponent
   color*: Color
-  size*: float32
+  size: float32
 
 var lastSquare: uint64 = 0
 
@@ -19,6 +19,16 @@ proc newSquare*(name: string, size: float32, color: Color): Square =
 proc newSquare*(size: float32, color: Color): Square =
   inc lastSquare
   result = newSquare("Square " & $lastSquare, size, color)
+
+proc size*(square: Square): float32 =
+  return square.size
+
+proc `size=`*(square: Square, newValue: float32) =
+  if (almostEqual(square.size, newValue)):
+    return
+  square.size = newValue
+  if (square.isExisting and (not square.parent.isNil)):
+    square.parent.makeDirty
 
 method draw*(square: Square, camera: Camera) =
   let data = square.decomposedTransform(camera)
