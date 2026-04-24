@@ -75,5 +75,7 @@ proc rectMerge*(rect1, rect2: Rect):Rect =
   result.width = max(r1x2, r2x2) - result.x
   result.height = max(r1y2, r2y2) - result.y
 
-
+proc rectsOverlaps*(r1,r2: Rect): bool = 
+  return r1.x <= r2.x + r2.width and r1.x + r1.width >= r2.x and
+    r1.y <= r2.y + r2.height and r1.y + r1.height >= r2.y
 
