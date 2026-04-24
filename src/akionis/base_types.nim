@@ -30,18 +30,18 @@ type
   CameraMask* = set[CameraId]
 
   Camera* = ref object of RootObj
-    matrix: Matrix3
+    matrix: Matrix3 ## View matrix
     invMatrix: Matrix3 ## Needed to calculate world pos from screen pos
-    id: CameraId
-    viewport: Rect
-    visibleWorldRect: Rect ## world rect visible in the camera
-    texture: ray.RenderTexture2D ## Should have viewport size
+    id: CameraId 
+    viewport: Rect ## The window space (rect) on which this camera draws (only when isFullScreen == false)
+    visibleWorldRect: Rect ## World rect visible in the camera (used for culling)
+    texture: ray.RenderTexture2D ## Texture on wich we reder, should have viewport size
     worldX: float32 ## World pos x 
     worldY: float32 ## World pos x
     scaleX: float32 = 1.0
     scaleY: float32 = 1.0
     rotation: float32
-    isActive*: bool = true
+    isActive*: bool = true ## Should this camera render anything
     isDirty: bool = true ## Should we recalculate camera matrix
     isFullScreen: bool = true ## When true don't use viewport
 
