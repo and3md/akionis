@@ -40,6 +40,18 @@ proc globalRectFromVec3*(worldMatrix: Matrix3, p1, p2, p3, p4: Vector3): Rect =
   result.width = max_x - min_x
   result.height = max_y - min_y
 
+proc boundingRectForPoints*(p1, p2, p3, p4: Vector2): Rect =
+  ## Creates bounding box based on for points
+  ## That rect can be bigger because it is a AABB rect
+  let min_x = min([p1.x, p2.x, p3.x, p4.x])
+  let max_x = max([p1.x, p2.x, p3.x, p4.x])
+  let min_y = min([p1.y, p2.y, p3.y, p4.y])
+  let max_y = max([p1.y, p2.y, p3.y, p4.y])
+  result.x = min_x
+  result.y = min_y
+  result.width = max_x - min_x
+  result.height = max_y - min_y
+
 const epsilon : float32 = 1e-7'f32
 
 proc isZero*(value: float32): bool =
