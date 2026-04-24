@@ -70,8 +70,8 @@ type
 
   Component* = ref object of RootObj
     name*: string
-    isEnabled: bool
     parent: Node
+    isEnabled: bool
 
   RenderedComponent* = ref object of Component
     cameras: CameraMask = {Camera1}
@@ -270,7 +270,7 @@ proc parent*(comp: Component): Node =
 proc isEnabled*(comp: Component): bool =
   return comp.isEnabled
 
-method `isEnabled=`(comp: Component, newValue: bool) =
+method `isEnabled=`*(comp: Component, newValue: bool) =
   comp.isEnabled = newValue
 
 # RenderedComponent ----------------------------------------
@@ -278,7 +278,7 @@ method `isEnabled=`(comp: Component, newValue: bool) =
 proc initRenderedComponent*(comp: RenderedComponent, name: string) =
   initComponent(comp, name)
 
-method `isEnabled=`(comp: RenderedComponent, newValue: bool) =
+method `isEnabled=`*(comp: RenderedComponent, newValue: bool) =
   if comp.isEnabled == newValue:
     return
   comp.isEnabled = newValue
