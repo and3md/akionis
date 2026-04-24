@@ -453,9 +453,12 @@ proc render(node: Node, camera: Camera) =
     node.drawNodeBoundingBox(camera)
 
 proc doRender(node: Node, camera: Camera) =
-  node.render(camera)
-  for child in node.children:
-    child.doRender(camera)
+  # Simple brute force culling by checking bounding box and camera visibleWorldRect
+  # Maybe it's worth add quadtree in the future
+  if rectsOverlaps(camera.visibleWorldRect, node.worldBoundingBox):
+    node.render(camera)
+    for child in node.children:
+      child.doRender(camera)
 
 proc doUpdate(node: Node, deltaTime: float) =
   for comp in node.components:
