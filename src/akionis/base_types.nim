@@ -71,7 +71,7 @@ type
   Component* = ref object of RootObj
     name*: string
     parent: Node
-    isEnabled: bool
+    isExisting: bool
 
   RenderedComponent* = ref object of Component
     cameras: CameraMask = {Camera1}
@@ -261,27 +261,27 @@ proc rectInCamera(cam: Camera, rect: var Rect): OrientedRect =
 # Component ------------------------------------------------
 
 proc initComponent*(comp: Component, name: string) =
-  comp.isEnabled = true
+  comp.isExisting = true
   comp.name = name
 
 proc parent*(comp: Component): Node =
   return comp.parent
 
-proc isEnabled*(comp: Component): bool =
-  return comp.isEnabled
+proc isExisting*(comp: Component): bool =
+  return comp.isExisting
 
-method `isEnabled=`*(comp: Component, newValue: bool) =
-  comp.isEnabled = newValue
+method `isExisting=`*(comp: Component, newValue: bool) =
+  comp.isExisting = newValue
 
 # RenderedComponent ----------------------------------------
 
 proc initRenderedComponent*(comp: RenderedComponent, name: string) =
   initComponent(comp, name)
 
-method `isEnabled=`*(comp: RenderedComponent, newValue: bool) =
-  if comp.isEnabled == newValue:
+method `isExisting=`*(comp: RenderedComponent, newValue: bool) =
+  if comp.isExisting == newValue:
     return
-  comp.isEnabled = newValue
+  comp.isExisting = newValue
   if not comp.parent.isNil:
     comp.parent.isDirty = true
 
@@ -395,13 +395,13 @@ proc addChild*(parentNode, newChild: Node) =
 proc addComponent*(node: Node, comp: Component) =
   node.components.add(comp)
   comp.parent = node
-  if comp.isEnabled and comp of RenderedComponent:
+  if comp.isExisting and comp of RenderedComponent:
     node.isDirty = true
 
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
   for comp in node.components:
-    if not comp.isEnabled:
+    if not comp.isExisting:
       continue
     if comp of RenderedComponent:
       if wasFirst:
@@ -461,7 +461,7 @@ proc drawNodeAndChildrenBoundingBoxes*(node: Node, camera: Camera) =
 
 proc render(node: Node, camera: Camera) =
   for comp in node.components:
-    if not comp.isEnabled:
+    if not comp.isExisting:
       continue
     if comp of RenderedComponent:
       let renderComp = RenderedComponent(comp)
@@ -482,7 +482,7 @@ proc doRender(node: Node, camera: Camera) =
 
 proc doUpdate(node: Node, deltaTime: float) =
   for comp in node.components:
-    if not comp.isEnabled:
+    if not comp.isExisting:
       continue
     if comp of ScriptComponent:
       update(ScriptComponent(comp), deltaTime)
