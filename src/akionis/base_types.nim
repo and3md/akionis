@@ -405,6 +405,9 @@ proc `rotation=`*(node: Node, newRotation: float) =
   node.rotation = newRotation
   node.isDirty = true
 
+proc makeDirty*(node: Node) =
+  node.isDirty = true
+
 proc worldMatrix*(node: Node): Matrix3 =
   return node.worldMatrix
 
