@@ -457,6 +457,22 @@ method update*(comp: UiComponent, deltaTime: float32) =
   ## Size calculation should be done in calculateMinSize and updateSize
   discard
 
+method worldBoundingBox*(comp: UiComponent): Rect =
+  let parent = comp.parent
+  if parent.isNil:
+    raise newException(
+      NoParentNode, "Can't calculate Square world bounding box without parent Node"
+    )
+
+  return globalRectFromVec3(
+    parent.worldMatrix * translate(vec2(comp.offsetX, comp.offsetY)),
+    vec3(0'f32, 0'f32, 1'f32),
+    vec3(0'f32, comp.size.height.float32, 1'f32),
+    vec3(comp.size.width.float32, comp.size.height.float32, 1'f32),
+    vec3(comp.size.width.float32, 0'f32, 1'f32),
+  )
+
+
 # Node -----------------------------------------------------
 
 proc initNode*(self: Node, x, y, scaleX, scaleY, rot: float32) =
