@@ -411,6 +411,30 @@ proc drawBoundingBox*(comp: RenderedComponent, camera: Camera) =
 method update*(self: ScriptComponent, deltaTime: float32) =
   echo "Empty script"
 
+# UiComponent ----------------------------------------------
+
+method draw*(self: UiComponent, camera: Camera) =
+  echo "draw ui component"
+
+method calculateMinSize*(self: UiComponent) =
+  ## Method to calculate minimum size
+  self.calculatedMimSize = Size(width: 0, height: 0)
+
+method updateSize*(self: UiComponent, availableArea: Rect) =
+  ## Method to update size with children
+  var newSize = self.calculatedMimSize
+  applyMinMaxSize(newSize, self.minSize, self.maxSize) 
+  if self.size == newSize:
+    return
+  self.size = newSize
+  if not self.parent.isNil:
+    self.parent.isDirty = true
+
+method update*(self: UiComponent, deltaTime: float32) =
+  ## Widget code that need to be run every frame,
+  ## Size calculation should be done in calculateMinSize and updateSize
+  discard
+
 # Node -----------------------------------------------------
 
 proc initNode*(self: Node, x, y, scaleX, scaleY, rot: float32) =
