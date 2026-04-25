@@ -615,6 +615,8 @@ proc doUpdate(node: Node, deltaTime: float) =
   for comp in node.components:
     if not comp.isExisting:
       continue
+    if comp of UiComponent:
+      update(UiComponent(comp), deltaTime)
     if comp of ScriptComponent:
       update(ScriptComponent(comp), deltaTime)
     elif comp of ClosureComponent:
