@@ -415,6 +415,17 @@ method update*(self: ScriptComponent, deltaTime: float32) =
 
 proc initUiComponent*(comp: UiComponent, name: string) =
   initRenderedComponent(comp, name)
+
+proc size*(comp: UiComponent): Size =
+  return comp.size
+
+proc `size=`*(comp: UiComponent, newSize: Size) = 
+  if comp.size == newSize:
+    return
+  comp.size = newSize
+  if comp.isExisting and (not comp.parent.isNil):
+    comp.parent.isDirty = true
+
 method draw*(comp: UiComponent, camera: Camera) =
   echo "draw ui component"
 
