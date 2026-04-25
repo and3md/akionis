@@ -79,3 +79,6 @@ proc rectsOverlaps*(r1,r2: Rect): bool =
   return r1.x <= r2.x + r2.width and r1.x + r1.width >= r2.x and
     r1.y <= r2.y + r2.height and r1.y + r1.height >= r2.y
 
+proc pointInsideRect*(rect: Rect, point: Vector2): bool =
+  return rect.x <= point.x and rect.x + rect.width >= point.x and
+    rect.y <= point.y and rect.y + rect.height >= point.y
