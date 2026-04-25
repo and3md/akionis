@@ -68,6 +68,9 @@ type
 
   RootNode* = ref object of Node
     parentState: State
+    hasUi: bool ## Does this hierarchy have ui elements?
+    needUiSizeUpdate: bool ## Should Ui recalculate its size
+    needUiLayoutUpdate: bool ## Should Ui update its layout
 
   Component* = ref object of RootObj
     name*: string
