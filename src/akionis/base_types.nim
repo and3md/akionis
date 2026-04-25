@@ -84,6 +84,36 @@ type
   ClosureComponent* = ref object of Component ## Component that runs onUpdate callback
     onUpdate*: proc(self: ClosureComponent, deltaTime: float)
 
+  UiComponent* = ref object of Component ## Base component for all UI components
+    calculatedMimSize: Size ## Minimum size with paddings calculated using content size
+    minSize: Size
+      ## Allows you to set the minimum size with paddings 0,0 means no constraints
+    maxSize: Size
+      ## Allows you to set the maximim size with paddings 0,0 means no constraints
+    widthFactor: int32
+      ## width factor flag:
+      ## 0 - do not expand (use min or min calculated),
+      ## 1 - expands, 
+      ## 2 - expands twice as strong as 1 etc.
+    heightFactor: int32
+      ## heiht factor flag:
+      ## 0 - do not expand (use min or min calculated),
+      ## 1 - expands, 
+      ## 2 - expands twice as strong as 1 etc.
+    size: Size
+      ## current used size with padding, can be set when UiComponent is not in layout
+    contentSize: Size ## size of content without paddings
+    padding: UiPadding ## space between conntent and border
+    isEnabled: bool ## is widget enabled
+    wantTabFocus: bool ## do widget wants focus from tab key 
+    tabIndex: Positive ## tab index in parent 
+
+  UiPadding = object
+    left: int32
+    right: int32
+    top: int32
+    bottom: int32
+
   AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
     ## Raised after second try game creation 
