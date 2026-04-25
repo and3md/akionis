@@ -874,3 +874,19 @@ proc doResize*(game: Game) =
 iterator getCameras*(game: Game): Camera =
   for cam in game.cameras:
     yield cam
+
+proc getCameraWithId*(game: Game, camId: CameraId): Camera =
+  for cam in  game.cameras:
+    if cam.id == camId:
+      return cam
+  return nil
+
+proc getFirstCameraFromMask*(game: Game, camId: CameraMask): Camera =
+  var firstId = Camera1
+  for id in camId:
+    firstId = id
+    break
+  for cam in  game.cameras:
+    if cam.id == firstId:
+      return cam
+  return nil
