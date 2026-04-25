@@ -133,6 +133,32 @@ type
 
 var instance: Game
 
+# Size -----------------------------------------------------
+
+proc sizeEmpty*(size: Size): bool =
+  ## At least one of width or height is 0
+  return size.width == 0 or size.height == 0
+
+proc sizeCompletelyEmpty*(size: Size): bool =
+  ## Width and height is zero
+  return size.width == 0 and size.height == 0
+
+proc applyMinMaxSize*(size: var Size, minSize, maxSize: Size) = 
+  ## Applies constraints to size
+  # min width
+  if minSize.width != 0 and size.width < minSize.width:
+    size.width = minSize.width
+  # min height
+  if minSize.height != 0 and size.height < minSize.height:
+    size.height = minSize.height
+  #max width
+  if maxSize.width != 0 and size.width > maxSize.width:
+    size.width = maxSize.width
+  #max height
+  if maxSize.height != 0 and size.height > maxSize.height:
+    size.height = maxSize.height
+ 
+
 # Camera ---------------------------------------------------
 
 proc worldX*(cam: Camera): float32 =
