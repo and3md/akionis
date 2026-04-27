@@ -736,13 +736,25 @@ proc doUpdate(node: Node, deltaTime: float) =
 # RootNode -------------------------------------------------
 
 proc updateAllTransforms(node: RootNode) =
-  ## Updates world matricies with checking dirty flags
+  ## Updates world matricies with checking dirty flags, and updates ui sizes when needed
   ## 
   ## We need iterate all Nodes but not every matrix will be recalculated
 
   # we use false and identity matrix on first level
   # because this is checked in updateTransforms() proc
   discard node.updateTransforms(mat3(), false)
+
+  if node.needUiSizeUpdate:
+    # currently ui nodes must start in child of root node
+    # this is a design assumption
+    for childWithUi in node.getChildrenWithUi:
+      if sizeEmpty(childWithUi.comp.maxSize):
+        raise newException(NoSizeForUi, "Top-level ui component must have max size")
+      childWithUi.comp.updateSize(childWithUi.comp.maxSize)
+    node.needUiSizeUpdate = false
+    # TODO: is it necessary? Maybe do not update transform second time 
+    # Currently only after needUiSizeUpdate 
+    discard node.updateTransforms(mat3(), false)
 
 proc renderWithAllCameras(node: RootNode) =
   for cam in node.parentState.game.cameras:
