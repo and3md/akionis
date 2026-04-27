@@ -437,6 +437,12 @@ proc minSize*(comp: UiComponent): Size =
 proc maxSize*(comp: UiComponent): Size =
   return comp.maxSize
 
+proc heightFactor*(comp: UiComponent): int32 =
+  return comp.heightFactor
+
+proc widthFactor*(comp: UiComponent): int32 =
+  return comp.heightFactor
+
 proc `size=`*(comp: UiComponent, newSize: Size) =
   if comp.size == newSize:
     return
