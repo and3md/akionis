@@ -13,6 +13,8 @@ type
   ButtonComponent* = ref object of UiComponent
     state: ButtonState
     color*: array[ButtonState, Color]
+    onClick*: proc(comp: ButtonComponent)
+    onUpdate*: proc(comp: ButtonComponent, deltaTime: float32)
 
 proc newButton*(name: string): ButtonComponent =
   result = new(ButtonComponent)
@@ -59,5 +61,13 @@ method update*(comp: ButtonComponent, deltaTime: float32) =
       comp.state = ButtonState.Down
     else:
       comp.state = ButtonState.Hover
+      # onClick support
+      if ray.isMouseButtonReleased(ray.MouseButton.Left):
+        if not comp.onClick.isNil:
+          comp.onClick(comp)
   else:
     comp.state = ButtonState.Up
+
+  # custom user update proc
+  if not comp.onUpdate.isNil:
+    comp.onUpdate(comp, deltaTime)
