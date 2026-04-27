@@ -340,6 +340,10 @@ proc isExisting*(comp: Component): bool =
 method `isExisting=`*(comp: Component, newValue: bool) =
   comp.isExisting = newValue
 
+method componentAddedToRoot(comp: Component, root: RootNode) =
+  ## Method runs when component is added to rootNode
+  discard
+
 # RenderedComponent ----------------------------------------
 
 proc initRenderedComponent*(comp: RenderedComponent, name: string) =
@@ -549,14 +553,28 @@ proc getRootNode*(node: Node): RootNode =
 proc worldMatrix*(node: Node): Matrix3 =
   return node.worldMatrix
 
+proc nodeAddedToRoot(node: Node, rootNode: RootNode) =
+  echo "Node added to root"
+  for child in node.children:
+    child.nodeAddedToRoot(rootNode)
+
+  for comp in node.components:
+    comp.componentAddedToRoot(rootNode)
+
 proc addChild*(parentNode, newChild: Node) =
   parentNode.children.add(newChild)
+  let rootNode = parentNode.getRootNode
+  if not rootNode.isNil:
+    nodeAddedToRoot(newChild, rootNode)
 
 proc addComponent*(node: Node, comp: Component) =
   node.components.add(comp)
   comp.parent = node
   if comp.isExisting and comp of RenderedComponent:
     node.isDirty = true
+    let rootNode = node.getRootNode
+    if not rootNode.isNil:
+      comp.componentAddedToRoot(rootNode)
 
 proc hasComponentOfType*[T](node: Node): bool =
   ## Checks, does node have component of type T
