@@ -85,7 +85,7 @@ type
   ScriptComponent* = ref object of Component ## Component that runs update method
 
   ClosureComponent* = ref object of Component ## Component that runs onUpdate callback
-    onUpdate*: proc(self: ClosureComponent, deltaTime: float)
+    onUpdate*: proc(self: ClosureComponent, deltaTime: float32)
 
   UiComponent* = ref object of RenderedComponent ## Base component for all UI components
     calculatedMinSize*: Size ## Minimum size with paddings calculated using content size
