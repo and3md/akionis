@@ -511,7 +511,7 @@ method worldBoundingBox*(comp: UiComponent): Rect =
   let parent = comp.parent
   if parent.isNil:
     raise newException(
-      NoParentNode, "Can't calculate Square world bounding box without parent Node"
+      NoParentNode, "Can't calculate Ui world bounding box without parent Node"
     )
 
   return globalRectFromVec3(
