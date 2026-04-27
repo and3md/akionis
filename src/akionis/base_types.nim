@@ -465,6 +465,10 @@ proc `size=`*(comp: UiComponent, newSize: Size) =
   if comp.isExisting and (not comp.parent.isNil):
     comp.parent.isDirty = true
 
+method componentAddedToRoot(comp: UiComponent, root: RootNode) =
+  root.needUiSizeUpdate = true
+  root.hasUi = true
+
 method draw*(comp: UiComponent, camera: Camera) =
   echo "draw ui component"
 
