@@ -570,7 +570,7 @@ proc getRootNode*(node: Node): RootNode =
   if node of RootNode:
     return RootNode(node)
   if node.parent.isNil:
-    raise newException(NoRootNode, "No Root Node")
+    return nil
   if node.parent of RootNode:
     return RootNode(node.parent)
   else:
