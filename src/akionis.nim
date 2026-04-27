@@ -6,7 +6,8 @@ import akionis/matrices
 import akionis/colors
 import akionis/components/square
 import akionis/components/ui/button
+import akionis/components/ui/vlayout
 
 export 
-  matrices, colors, base_types, game_loop, square, button
+  matrices, colors, base_types, game_loop, square, button, vlayout
   
