@@ -427,6 +427,12 @@ proc initUiComponent*(comp: UiComponent, name: string) =
 proc size*(comp: UiComponent): Size =
   return comp.size
 
+proc minSize*(comp: UiComponent): Size =
+  return comp.minSize
+
+proc maxSize*(comp: UiComponent): Size =
+  return comp.maxSize
+
 proc `size=`*(comp: UiComponent, newSize: Size) =
   if comp.size == newSize:
     return
