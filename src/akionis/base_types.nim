@@ -472,8 +472,9 @@ method calculateMinSize*(comp: UiComponent) =
   ## Method to calculate minimum size
   comp.calculatedMinSize = Size(width: 0, height: 0)
 
-method updateSize*(comp: UiComponent, availableArea: Rect) =
+method updateSize*(comp: UiComponent, availableSize: Size) =
   ## Method to update size with children
+  comp.calculateMinSize
   var newSize = comp.calculatedMinSize
   applyMinMaxSize(newSize, comp.minSize, comp.maxSize)
   if comp.size == newSize:
