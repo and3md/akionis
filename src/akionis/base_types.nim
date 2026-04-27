@@ -459,7 +459,7 @@ proc heightFactor*(comp: UiComponent): int32 =
   return comp.heightFactor
 
 proc widthFactor*(comp: UiComponent): int32 =
-  return comp.heightFactor
+  return comp.widthFactor
 
 proc `size=`*(comp: UiComponent, newSize: Size) =
   if comp.size == newSize:
