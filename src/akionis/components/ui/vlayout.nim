@@ -92,13 +92,13 @@ method updateSize*(comp: VLayout, availableSize: Size) =
       size.width = max(r.comp.calculatedMinSize.width, newSize.width)
       size.width = max(size.width, r.comp.maxSize.width)
       r.comp.size = size
-    case comp.hAlignment:
-      of HAlignment.Left:
-        r.node.x = 0'f32
-      of HAlignment.Right:
-        r.node.x = max(0, maxWidth - r.comp.size.width).float32
-      of HAlignment.Center:
-        r.node.x = max(0, ((maxWidth - r.comp.size.width) div 2).float32).float32
+    case comp.hAlignment
+    of HAlignment.Left:
+      r.node.x = 0'f32
+    of HAlignment.Right:
+      r.node.x = max(0, maxWidth - r.comp.size.width).float32
+    of HAlignment.Center:
+      r.node.x = max(0, ((maxWidth - r.comp.size.width) div 2).float32).float32
 
   # Phase 3: Expand children to use remaining space
   var remainingHeight = newSize.height - usedSpace
@@ -107,7 +107,7 @@ method updateSize*(comp: VLayout, availableSize: Size) =
     let spacePerHeightFactor = int32(remainingHeight / heightFactorSum)
     # iterate over children and add space
     wasFirstChild = false
-    var deltaY:int32 = 0 
+    var deltaY: int32 = 0
     for r in children:
       r.node.y = r.node.y + deltaY.float32
       if r.comp.heightFactor > 0:
