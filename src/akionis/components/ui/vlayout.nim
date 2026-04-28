@@ -1,18 +1,9 @@
 import ../../base_types
 import math
 from raylib as ray import nil
+import alignment
 
 type
-  VAlignment* {.pure.} = enum
-    Top
-    Center
-    Bottom
-
-  HAlignment* {.pure.} = enum
-    Left
-    Center
-    Right
-
   VLayout = ref object of UiComponent
     spacing: int32
     vAlignment: VAlignment
