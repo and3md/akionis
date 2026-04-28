@@ -494,9 +494,8 @@ method calculateMinSize*(comp: UiComponent) =
   ## Method to calculate minimum size
   comp.calculatedMinSize = Size(width: 0, height: 0)
 
-method updateSize*(comp: UiComponent, availableSize: Size) =
-  ## Method to update size with children
-  comp.calculateMinSize
+method updateLayout*(comp: UiComponent, availableSize: Size) =
+  ## Method to update layout, default implementation only set size to calculatedMinSize
   var newSize = comp.calculatedMinSize
   applyMinMaxSize(newSize, comp.minSize, comp.maxSize)
   if comp.size == newSize:
@@ -765,10 +764,19 @@ proc updateAllTransforms(node: RootNode) =
   if node.needUiSizeUpdate:
     # currently ui nodes must start in child of root node
     # this is a design assumption
+    var children: seq[tuple[node: Node, comp: UiComponent]]
+    # phase 1 - calculate min size
     for childWithUi in node.getChildrenWithUi:
+      if not childWithUi.comp.isExisting:
+        continue
+      children.add(childWithUi)
+      childWithUi.comp.calculateMinSize
+      
+    # phase 2 - update layout
+    for childWithUi in children:
       if sizeEmpty(childWithUi.comp.maxSize):
         raise newException(NoSizeForUi, "Top-level ui component must have max size")
-      childWithUi.comp.updateSize(childWithUi.comp.maxSize)
+      childWithUi.comp.updateLayout(childWithUi.comp.maxSize)
     node.needUiSizeUpdate = false
     # TODO: is it necessary? Maybe do not update transform second time 
     # Currently only after needUiSizeUpdate 

@@ -20,6 +20,10 @@ type
     spacing: int32
     vAlignment: VAlignment
     hAlignment: HAlignment
+    usedSpace: int32 = 0 ## Used space for calculated min size
+    heightFactorSum: int32 = 0 ## Sum of height factors
+    maxWidth: int32 = 0 ## Max width for calculated min size
+    widthFactorSum: int32 = 0
 
 proc newVLayout*(name: string): VLayout =
   result = new(VLayout)
@@ -58,106 +62,124 @@ proc `spacing=`*(comp: VLayout, newSpacingValue: int32) =
 method draw*(comp: VLayout, camera: Camera) =
   discard
 
-method updateSize*(comp: VLayout, availableSize: Size) =
-  ## Method to update size with children, we runt this only on root ui node
+method calculateMinSize*(comp: VLayout) =
+  # Reset values
+  comp.usedSpace = 0
+  comp.heightFactorSum = 0
+  comp.widthFactorSum = 0
+  comp.maxWidth = 0
+
+  var newSize = Size(width: 0, height: 0)
+  let parent = comp.parent
+
+  # Phase 1: Calculate children min size
+  if parent.isNil:
+    # no parent Node so just return
+    return
+
+  var wasFirstChild = false
+  for r in parent.getChildrenWithUi:
+    if not r.comp.isExisting:
+      continue
+
+    r.comp.calculateMinSize
+
+    if wasFirstChild:
+      comp.usedSpace += comp.spacing
+    else:
+      comp.usedSpace += comp.padding.top
+      wasFirstChild = true
+
+    comp.usedSpace += r.comp.calculatedMinSize.height
+    comp.heightFactorSum += r.comp.heightFactor
+    comp.maxWidth = max(
+      comp.maxWidth,
+      r.comp.calculatedMinSize.width + r.comp.padding.left + r.comp.padding.right,
+    )
+    comp.widthFactorSum += r.comp.widthFactor
+
+  # Add bottom padding
+  comp.usedSpace += comp.padding.bottom
+
+  newSize.width = comp.maxWidth
+  newSize.height = comp.usedSpace
+  comp.calculatedMinSize = newSize
+
+method updateLayout*(comp: VLayout, availableSize: Size) =
+  ## Method to set size, alignment with children, we runt this only on root ui node
   ## Children are calculated recursively
 
   var newSize = availableSize
   applyMinMaxSize(newSize, comp.minSize, comp.maxSize)
   let parent = comp.parent
 
-  # Phase 1: Update children size
+  # Phase 1: Get excess size
   if parent.isNil:
     # no parent Node so just return
     return
 
+  var remainingHeight = newSize.height - comp.usedSpace
+  let spacePerHeightFactor =
+    if remainingHeight > 0:
+      int32(remainingHeight / comp.heightFactorSum)
+    else:
+      0
+
+  var y = comp.padding.top
+  var haveExpanding = comp.heightFactorSum > 0
+  
+  if not haveExpanding and remainingHeight > 0:
+    # No expanding so set vertical alignment
+    case comp.vAlignment
+    of VAlignment.Top:
+      discard
+    of VAlignment.Center:
+      y += (remainingHeight / 2).int32
+    of VAlignment.Bottom:
+      y += remainingHeight
+
   var children: seq[tuple[node: Node, comp: UiComponent]]
   for r in parent.getChildrenWithUi:
-    if r.comp.isExisting:
-      children.add(r)
-      r.comp.updateSize(availableSize)
-
-  # Phase 2: Set position and calculate used space without 
-
-  # check max width, must be done before next loop
-  var maxWidth: int32 = 0
-  for r in children:
-    if r.comp.widthFactor > 0:
-      maxWidth = newSize.width
-      break
-    maxWidth = max(maxWidth, r.comp.size.width)
-    if maxWidth == newSize.width:
-      break
+    if not r.comp.isExisting:
+      continue
+    children.add(r)
 
   # width and horizontal alignment
-  var usedSpace: int32 = 0
-  var heightFactorSum: int32 = 0
-  var y: int32 = 0
   var wasFirstChild = false
   for r in children:
     if wasFirstChild:
-      usedSpace += comp.spacing
+      y += comp.spacing
     else:
       wasFirstChild = true
-    # height:
-    r.node.y = float32(y + usedSpace)
-    usedSpace += r.comp.calculatedMinSize.height
-    heightFactorSum += r.comp.heightFactor
-    # width:
-    # update width based on width factor
+
+    r.node.y = y.float32
+    # calculate height
+    var childHeight = r.comp.calculatedMinSize.height
+    if r.comp.heightFactor > 0:
+      childHeight += spacePerHeightFactor * r.comp.heightFactor
+    # TODO add max width min width checking
+
+    # calcualte width
+    var childWidth = r.comp.calculatedMinSize.width
     if r.comp.widthFactor > 0:
-      var size = r.comp.size
-      size.width = max(r.comp.calculatedMinSize.width, newSize.width)
-      size.width = max(size.width, r.comp.maxSize.width)
-      r.comp.size = size
-    case comp.hAlignment
-    of HAlignment.Left:
-      r.node.x = 0'f32
-    of HAlignment.Right:
-      r.node.x = max(0, maxWidth - r.comp.size.width).float32
-    of HAlignment.Center:
-      r.node.x = max(0, ((maxWidth - r.comp.size.width) div 2).float32).float32
+      childWidth += spacePerHeightFactor * r.comp.widthFactor
+    # TODO add max width min width checking
 
-  # Phase 3: Expand to use remaining space or vertical alignment of children 
-  var remainingHeight = newSize.height - usedSpace
-  var maxHeight = usedSpace
-  if remainingHeight > 0:
-    if heightFactorSum > 0:
-      # expand size to use remaining space
-      # calculate space per one height factor
-      let spacePerHeightFactor = int32(remainingHeight / heightFactorSum)
-      # iterate over children and add space
-      wasFirstChild = false
-      var deltaY: int32 = 0
-      for r in children:
-        r.node.y = r.node.y + deltaY.float32
-        if r.comp.heightFactor > 0:
-          let extraHeight = spacePerHeightFactor * r.comp.heightFactor
-          var size = r.comp.size
-          size.height += extraHeight
-          r.comp.size = size
-          deltaY += spacePerHeightFactor * r.comp.heightFactor
-      maxHeight = newSize.height
+    if r.comp.widthFactor == 0:
+      case comp.hAlignment
+      of HAlignment.Left:
+        r.node.x = 0'f32
+      of HAlignment.Center:
+        r.node.x = ((newSize.width - r.comp.calculatedMinSize.width) / 2).float32
+      of HAlignment.Right:
+        r.node.x = (newSize.width - r.comp.calculatedMinSize.width).float32
     else:
-      # vertical alignment of children 
-      case comp.vAlignment
-      of VAlignment.Top:
-        maxHeight = usedSpace
-      of VAlignment.Bottom:
-        # move all children to end
-        maxHeight = newSize.height
-        for r in children:
-          r.node.y = r.node.y + remainingHeight.float32
-      of VAlignment.Center:
-        # move all children half of remainingHeight
-        maxHeight = newSize.height
-        let halfOfremainingHeight = floor(remainingHeight / 2).float32
-        for r in children:
-          r.node.y = r.node.y + halfOfremainingHeight
+      r.node.x = 0'f32
 
-  newSize.height = maxHeight
-  newSize.width = maxWidth
-  echo "vlayout newSize ", newSize
+    r.comp.size = Size(width: childWidth, height: childHeight)
+
+    y += childHeight
+
   if comp.size == newSize:
     return
   comp.size = newSize
