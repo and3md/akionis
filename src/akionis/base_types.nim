@@ -111,11 +111,11 @@ type
     wantTabFocus: bool ## do widget wants focus from tab key 
     tabIndex: Positive ## tab index in parent 
 
-  UiPadding = object
-    left: int32
-    right: int32
-    top: int32
-    bottom: int32
+  UiPadding* = object
+    left*: int32
+    right*: int32
+    top*: int32
+    bottom*: int32
 
   AkionisExcpetion* = object of CatchableError ## Base Akionis exception
   GameAlreadyCreated* = object of AkionisExcpetion
