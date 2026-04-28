@@ -494,14 +494,8 @@ method calculateMinSize*(comp: UiComponent) =
   comp.minSize = Size(width: 0, height: 0)
 
 method updateLayout*(comp: UiComponent, availableSize: Size) =
-  ## Method to update layout, default implementation only set size to minSize
-  var newSize = comp.minSize
-  applyMinMaxConstraint(newSize, comp.minConstraint, comp.maxConstraint)
-  if comp.size == newSize:
-    return
-  comp.size = newSize
-  if not comp.parent.isNil:
-    comp.parent.isDirty = true
+  ## Method to update layout, only used by layout components
+  discard
 
 method update*(comp: UiComponent, deltaTime: float32) =
   ## Widget code that need to be run every frame,
