@@ -110,7 +110,7 @@ method updateLayout*(comp: VLayout, availableSize: Size) =
   ## Children are calculated recursively
 
   var newSize = availableSize
-  applyMinMaxSize(newSize, comp.minSize, comp.maxSize)
+  applyMinMaxConstraint(newSize, comp.minConstraint, comp.maxConstraint)
   let parent = comp.parent
 
   # Phase 1: Get excess size
@@ -158,18 +158,18 @@ method updateLayout*(comp: VLayout, availableSize: Size) =
     if r.comp.heightFactor > 0:
       childHeight += spacePerHeightFactor * r.comp.heightFactor
     # height constraints
-    if r.comp.maxSize.height != 0:
-      childHeight = min(childHeight, r.comp.maxSize.height)
-    childHeight = max(childHeight, r.comp.minSize.height)
+    if r.comp.maxConstraint.height != 0:
+      childHeight = min(childHeight, r.comp.maxConstraint.height)
+    childHeight = max(childHeight, r.comp.minConstraint.height)
 
     # calcualte width
     var childWidth = r.comp.calculatedMinSize.width
     if r.comp.widthFactor > 0:
       childWidth = newSize.width - comp.padding.left - comp.padding.right
     # width constraints
-    if r.comp.maxSize.width != 0:
-      childWidth = min(childWidth, r.comp.maxSize.width)
-    childWidth = max(childWidth, r.comp.minSize.width)
+    if r.comp.maxConstraint.width != 0:
+      childWidth = min(childWidth, r.comp.maxConstraint.width)
+    childWidth = max(childWidth, r.comp.minConstraint.width)
 
     if r.comp.widthFactor == 0 or childWidth != newSize.width:
       case comp.hAlignment
