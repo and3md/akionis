@@ -28,6 +28,24 @@ proc newVLayout*(name: string): VLayout =
   result.vAlignment = VAlignment.Center
   result.hAlignment = HAlignment.Center
 
+proc vAlignment*(comp: VLayout): VAlignment =
+  return comp.vAlignment
+
+proc `vAlignment=`*(comp: VLayout, newValue: VAlignment) =
+  if comp.vAlignment == newValue:
+    return
+  comp.vAlignment = newValue
+  comp.uiNeedsSizeUpdate
+
+proc hAlignment*(comp: VLayout): HAlignment =
+  return comp.hAlignment
+
+proc `hAlignment=`*(comp: VLayout, newValue: HAlignment) =
+  if comp.hAlignment == newValue:
+    return
+  comp.hAlignment = newValue
+  comp.uiNeedsSizeUpdate
+
 proc spacing*(comp: VLayout): int32 =
   return comp.spacing
 
