@@ -78,13 +78,9 @@ method updateSize*(comp: VLayout, availableSize: Size) =
       r.comp.updateSize(availableSize)
 
   # Phase 2: Set position and calculate used space without 
-  var usedSpace: int32 = 0
-  var heightFactorSum: int32 = 0
-  var y: int32 = 0
-  var wasFirstChild = false
-  var maxWidth: int32 = 0
-
+  
   # check max width, must be done before next loop
+  var maxWidth: int32 = 0
   for r in children:
     if r.comp.widthFactor > 0:
       maxWidth = newSize.width
@@ -94,6 +90,10 @@ method updateSize*(comp: VLayout, availableSize: Size) =
       break
 
   # width and horizontal alignment
+  var usedSpace: int32 = 0
+  var heightFactorSum: int32 = 0
+  var y: int32 = 0
+  var wasFirstChild = false
   for r in children:
     if wasFirstChild:
       usedSpace += comp.spacing
