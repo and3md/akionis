@@ -6,12 +6,12 @@ import sequtils
 from raylib as ray import nil
 
 type
-  VAlignment {.pure.} = enum
+  VAlignment* {.pure.} = enum
     Top
     Center
     Bottom
 
-  HAlignment {.pure.} = enum
+  HAlignment* {.pure.} = enum
     Left
     Center
     Right
@@ -78,7 +78,7 @@ method updateSize*(comp: VLayout, availableSize: Size) =
       r.comp.updateSize(availableSize)
 
   # Phase 2: Set position and calculate used space without 
-  
+
   # check max width, must be done before next loop
   var maxWidth: int32 = 0
   for r in children:
@@ -118,24 +118,44 @@ method updateSize*(comp: VLayout, availableSize: Size) =
     of HAlignment.Center:
       r.node.x = max(0, ((maxWidth - r.comp.size.width) div 2).float32).float32
 
-  # Phase 3: Expand children to use remaining space
+  # Phase 3: Expand to use remaining space or vertical alignment of children 
   var remainingHeight = newSize.height - usedSpace
-  if heightFactorSum > 0 and remainingHeight > 0:
-    # calculate space per one height factor
-    let spacePerHeightFactor = int32(remainingHeight / heightFactorSum)
-    # iterate over children and add space
-    wasFirstChild = false
-    var deltaY: int32 = 0
-    for r in children:
-      r.node.y = r.node.y + deltaY.float32
-      if r.comp.heightFactor > 0:
-        let extraHeight = spacePerHeightFactor * r.comp.heightFactor
-        var size = r.comp.size
-        size.height += extraHeight
-        r.comp.size = size
-        deltaY += spacePerHeightFactor * r.comp.heightFactor
+  var maxHeight = usedSpace
+  if remainingHeight > 0:
+    if heightFactorSum > 0:
+      # expand size to use remaining space
+      # calculate space per one height factor
+      let spacePerHeightFactor = int32(remainingHeight / heightFactorSum)
+      # iterate over children and add space
+      wasFirstChild = false
+      var deltaY: int32 = 0
+      for r in children:
+        r.node.y = r.node.y + deltaY.float32
+        if r.comp.heightFactor > 0:
+          let extraHeight = spacePerHeightFactor * r.comp.heightFactor
+          var size = r.comp.size
+          size.height += extraHeight
+          r.comp.size = size
+          deltaY += spacePerHeightFactor * r.comp.heightFactor
+      maxHeight = newSize.height
+    else:
+      # vertical alignment of children 
+      case comp.vAlignment
+      of VAlignment.Top:
+        maxHeight = usedSpace
+      of VAlignment.Bottom:
+        # move all children to end
+        maxHeight = newSize.height
+        for r in children:
+          r.node.y = r.node.y + remainingHeight.float32
+      of VAlignment.Center:
+        # move all children half of remainingHeight
+        maxHeight = newSize.height
+        let halfOfremainingHeight = floor(remainingHeight / 2).float32
+        for r in children:
+          r.node.y = r.node.y + halfOfremainingHeight
 
-  newSize.height = usedSpace
+  newSize.height = maxHeight
   newSize.width = maxWidth
   echo "vlayout newSize ", newSize
   if comp.size == newSize:
