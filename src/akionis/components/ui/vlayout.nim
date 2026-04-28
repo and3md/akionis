@@ -90,11 +90,11 @@ method calculateMinSize*(comp: VLayout) =
       comp.usedSpace += comp.padding.top
       wasFirstChild = true
 
-    comp.usedSpace += r.comp.calculatedMinSize.height
+    comp.usedSpace += r.comp.minSize.height
     comp.heightFactorSum += r.comp.heightFactor
     comp.maxWidth = max(
       comp.maxWidth,
-      r.comp.calculatedMinSize.width + r.comp.padding.left + r.comp.padding.right,
+      r.comp.minSize.width + r.comp.padding.left + r.comp.padding.right,
     )
     comp.widthFactorSum += r.comp.widthFactor
 
@@ -103,7 +103,7 @@ method calculateMinSize*(comp: VLayout) =
 
   newSize.width = comp.maxWidth
   newSize.height = comp.usedSpace
-  comp.calculatedMinSize = newSize
+  comp.minSize = newSize
 
 method updateLayout*(comp: VLayout, availableSize: Size) =
   ## Method to set size, alignment with children, we runt this only on root ui node
@@ -154,7 +154,7 @@ method updateLayout*(comp: VLayout, availableSize: Size) =
 
     r.node.y = y.float32
     # calculate height
-    var childHeight = r.comp.calculatedMinSize.height
+    var childHeight = r.comp.minSize.height
     if r.comp.heightFactor > 0:
       childHeight += spacePerHeightFactor * r.comp.heightFactor
     # height constraints
@@ -163,7 +163,7 @@ method updateLayout*(comp: VLayout, availableSize: Size) =
     childHeight = max(childHeight, r.comp.minConstraint.height)
 
     # calcualte width
-    var childWidth = r.comp.calculatedMinSize.width
+    var childWidth = r.comp.minSize.width
     if r.comp.widthFactor > 0:
       childWidth = newSize.width - comp.padding.left - comp.padding.right
     # width constraints
@@ -179,13 +179,13 @@ method updateLayout*(comp: VLayout, availableSize: Size) =
         r.node.x = (
           (
             newSize.width - comp.padding.left - comp.padding.right -
-            r.comp.calculatedMinSize.width
+            r.comp.minSize.width
           ) / 2
         ).float32
       of HAlignment.Right:
         r.node.x = (
           newSize.width - comp.padding.left - comp.padding.right -
-          r.comp.calculatedMinSize.width
+          r.comp.minSize.width
         ).float32
     else:
       r.node.x = comp.padding.right.float32

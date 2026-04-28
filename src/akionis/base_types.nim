@@ -88,11 +88,11 @@ type
     onUpdate*: proc(self: ClosureComponent, deltaTime: float)
 
   UiComponent* = ref object of RenderedComponent ## Base component for all UI components
-    calculatedMinSize*: Size ## Minimum size with paddings calculated using content size
+    minSize*: Size ## Minimum size with paddings calculated in calculateMinSize method
     minConstraint: Size
-      ## Allows you to set the minimum size with paddings 0,0 means no constraints
+      ## Allows you to set the minimum size with paddings, 0,0 means no constraints
     maxConstraint: Size
-      ## Allows you to set the maximim size with paddings 0,0 means no constraints
+      ## Allows you to set the maximim size with paddings, 0,0 means no constraints
     widthFactor: int32
       ## width factor flag:
       ## 0 - do not expand (use min or min calculated),
@@ -491,11 +491,11 @@ method draw*(comp: UiComponent, camera: Camera) =
 
 method calculateMinSize*(comp: UiComponent) =
   ## Method to calculate minimum size
-  comp.calculatedMinSize = Size(width: 0, height: 0)
+  comp.minSize = Size(width: 0, height: 0)
 
 method updateLayout*(comp: UiComponent, availableSize: Size) =
-  ## Method to update layout, default implementation only set size to calculatedMinSize
-  var newSize = comp.calculatedMinSize
+  ## Method to update layout, default implementation only set size to minSize
+  var newSize = comp.minSize
   applyMinMaxConstraint(newSize, comp.minConstraint, comp.maxConstraint)
   if comp.size == newSize:
     return
