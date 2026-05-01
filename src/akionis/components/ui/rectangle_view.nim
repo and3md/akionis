@@ -13,6 +13,13 @@ proc newRectangleView*(name:string): RectangleView =
   result = new(RectangleView)
   initUiComponent(result, name)
 
+proc newRectangleView*(width: int32, height: int32, name:string): RectangleView =
+  result = new(RectangleView)
+  initUiComponent(result, name)
+  result.minConstraint = Size(width: width, height: height)
+  result.maxConstraint = Size(width: width, height: height)
+
+
 method draw*(rectView: RectangleView, camera: Camera) =
   let data = rectView.decomposedTransform(camera)
   ray.drawRectangle(
