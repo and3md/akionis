@@ -223,6 +223,11 @@ method updateLayout*(comp: BorderLayout, availableSize: Size) =
           childrenArray[pos].comp.minSize.width +
           childrenArray[pos].comp.widthFactor * spacePerWidthFactor,
       )
+      applyMinMaxConstraint(
+        size,
+        childrenArray[pos].comp.minConstraint,
+        childrenArray[pos].comp.maxConstraint,
+      )
       childrenArray[pos].comp.size = size
       childrenArray[pos].comp.updateLayout(size)
       x += size.width
@@ -244,6 +249,11 @@ method updateLayout*(comp: BorderLayout, availableSize: Size) =
         childrenArray[BorderLayoutPosition.Top].comp.minSize.width +
         childrenArray[BorderLayoutPosition.Top].comp.widthFactor * spacePerWidthFactor,
     )
+    applyMinMaxConstraint(
+      size,
+      childrenArray[BorderLayoutPosition.Top].comp.minConstraint,
+      childrenArray[BorderLayoutPosition.Top].comp.maxConstraint,
+    )
     childrenArray[BorderLayoutPosition.Top].comp.size = size
     childrenArray[BorderLayoutPosition.Top].comp.updateLayout(size)
 
@@ -263,6 +273,11 @@ method updateLayout*(comp: BorderLayout, availableSize: Size) =
       width:
         childrenArray[BorderLayoutPosition.Bottom].comp.minSize.width +
         childrenArray[BorderLayoutPosition.Bottom].comp.widthFactor * spacePerWidthFactor,
+    )
+    applyMinMaxConstraint(
+      size,
+      childrenArray[BorderLayoutPosition.Bottom].comp.minConstraint,
+      childrenArray[BorderLayoutPosition.Bottom].comp.maxConstraint,
     )
     childrenArray[BorderLayoutPosition.Bottom].comp.size = size
     childrenArray[BorderLayoutPosition.Bottom].comp.updateLayout(size)
