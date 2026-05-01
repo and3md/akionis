@@ -456,6 +456,12 @@ proc size*(comp: UiComponent): Size =
 proc minConstraint*(comp: UiComponent): Size =
   return comp.minConstraint
 
+proc `minConstraint=`*(comp: UiComponent, newMinSize: Size) =
+  if comp.minConstraint == newMinSize:
+    return
+  comp.minConstraint = newMinSize
+  comp.uiNeedsMinSizeUpdate
+
 proc maxConstraint*(comp: UiComponent): Size =
   return comp.maxConstraint
 
