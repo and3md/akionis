@@ -40,7 +40,8 @@ method draw*(button: ButtonComponent, camera: Camera) =
   )
 
 method calculateMinSize*(comp: ButtonComponent) =
-  let newMinSize = Size(width: 50, height: 30)
+  var newMinSize = Size(width: 50, height: 30)
+  applyMinMaxConstraint(newMinSize, comp.minConstraint, comp.maxConstraint)
   comp.minSize = newMinSize
 
 method update*(comp: ButtonComponent, deltaTime: float32) =
