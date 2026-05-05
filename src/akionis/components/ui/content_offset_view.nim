@@ -16,6 +16,8 @@ proc newContentOffsetView*(name: string): ContentOffsetView =
   result = new(ContentOffsetView)
   result.initUiComponent(name)
   result.isClipChildren = true
+  result.widthFactor = 1
+  result.heightFactor = 1
 
 method calculateMinSize*(comp: ContentOffsetView) =
   comp.minSize = Size(
@@ -67,6 +69,7 @@ method updateLayout*(comp: ContentOffsetView, availableSize: Size) =
     comp.contentSize = childSize
     childComp.updateLayout(childComp.size)
   comp.size = newSize
+  echo "ContentOffSetLayout size: ", comp.size
 
 method draw*(comp: ContentOffsetView, camera: Camera) =
   discard
