@@ -228,24 +228,6 @@ method updateLayout*(comp: BorderLayout, availableSize: Size) =
       break
     inc currentPos
 
-  # Get the biggest position in horzontal space
-  var biggestMinWidthHorizontal: BorderLayoutPositions
-  if BorderLayoutPosition.Left in availablePositions:
-    biggestMinWidthHorizontal.incl(BorderLayoutPosition.Left)
-  
-  if childrenArray[BorderLayoutPosition.Top].comp.minSize.width > childrenArray[BorderLayoutPosition.Center].comp.minSize.width and
-    childrenArray[BorderLayoutPosition.Top].comp.minSize.width > childrenArray[BorderLayoutPosition.Bottom].comp.minSize.width:
-      biggestMinWidthHorizontal.incl(BorderLayoutPosition.Top)
-  else:
-    if childrenArray[BorderLayoutPosition.Center].comp.minSize.width > childrenArray[BorderLayoutPosition.Top].comp.minSize.width and
-      childrenArray[BorderLayoutPosition.Center].comp.minSize.width > childrenArray[BorderLayoutPosition.Bottom].comp.minSize.width:
-      biggestMinWidthHorizontal.incl(BorderLayoutPosition.Center)
-    else:
-      biggestMinWidthHorizontal.incl(BorderLayoutPosition.Bottom)
-
-  if BorderLayoutPosition.Right in availablePositions:
-    biggestMinWidthHorizontal.incl(BorderLayoutPosition.Right)
-
   # biggest min size is the widest used space 
   let biggestMinWidth = comp.minSize.width
   # calculate free space and 
