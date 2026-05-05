@@ -766,12 +766,28 @@ proc doRender(node: Node, camera: Camera) =
   if rectsOverlaps(camera.visibleWorldRect, node.worldBoundingBox):
     let childrenClipRect = node.render(camera)
     if childrenClipRect.isSome:
-      let clipRect = childrenClipRect.get()
-      ray.beginScissorMode(clipRect.x.int32, clipRect.y.int32, clipRect.width.int32, clipRect.height.int32)
+      # TODO: should be chnaged to camera set clipping
+      var clipRect = childrenClipRect.get()
+      let camClipRect = camera.rectInCamera(clipRect)
+      # echo "clipping: ",
+      #   camClipRect.corners[0].x.int32,
+      #   ", ",
+      #   camClipRect.corners[0].y.int32,
+      #   ", ",
+      #   int32(camClipRect.corners[1].x - camClipRect.corners[0].x),
+      #   ", ",
+      #   int32(camClipRect.corners[3].y - camClipRect.corners[0].y)
+      ray.beginScissorMode(
+        camClipRect.corners[0].x.int32,
+        camClipRect.corners[0].y.int32,
+        int32(camClipRect.corners[1].x - camClipRect.corners[0].x),
+        int32(camClipRect.corners[3].y - camClipRect.corners[0].y),
+      )
     for child in node.children:
       child.doRender(camera)
     if childrenClipRect.isSome:
       ray.endScissorMode()
+      #echo "clipping end"
 
 proc doUpdate(node: Node, deltaTime: float) =
   for comp in node.components:
