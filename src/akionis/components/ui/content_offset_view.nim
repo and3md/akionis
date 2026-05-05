@@ -66,3 +66,6 @@ method updateLayout*(comp: ContentOffsetView, availableSize: Size) =
     comp.contentSize = childSize
     childComp.updateLayout(childComp.size)
   comp.size = newSize
+
+method draw*(comp: ContentOffsetView, camera: Camera) =
+  discard
