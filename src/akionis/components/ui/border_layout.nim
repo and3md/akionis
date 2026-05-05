@@ -32,6 +32,8 @@ proc newBorderLayout*(name: string): BorderLayout =
   result = new (BorderLayout)
   initUiComponent(result, name)
   result.spacing = 2
+  result.vAlignment = VAlignment.Top
+  result.hAlignment = HAlignment.Left
 
 proc vAlignment*(comp: BorderLayout): VAlignment =
   return comp.vAlignment
