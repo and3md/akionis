@@ -664,6 +664,17 @@ iterator getChildrenWithUi*(node: Node): tuple[node: Node, comp: UiComponent] =
   for n in getChildrenWithFirstComponentOfType[UiComponent](node):
     yield n
 
+proc getFirstChildWithComponentOfType*[T](
+    node: Node
+): Option[tuple[node: Node, comp: T]] =
+  ## Returns first child width component of type T
+  var comp: T
+  for child in node.children:
+    comp = getFirstComponentOfType[T](child)
+    if not comp.isNil:
+      return some((node: child, comp: comp))
+  return none(tuple[node: Node, comp: T])
+
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
   for comp in node.components:
