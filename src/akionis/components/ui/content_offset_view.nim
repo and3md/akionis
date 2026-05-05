@@ -15,6 +15,7 @@ type ContentOffsetView* = ref object of UiComponent
 proc newContentOffsetView*(name: string): ContentOffsetView =
   result = new(ContentOffsetView)
   result.initUiComponent(name)
+  result.isClipChildren = true
 
 method calculateMinSize*(comp: ContentOffsetView) =
   comp.minSize = Size(
