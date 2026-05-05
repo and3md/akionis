@@ -314,11 +314,11 @@ method updateLayout*(comp: BorderLayout, availableSize: Size) =
   let biggestMinHeight = comp.minSize.height
   # calculate free space and 
   var remainingHeightInHighestPlace = newSize.height - biggestMinHeight
-  var highestColWidthFactorSum = comp.heightFactorSum[comp.highestColumn]
+  var highestColHeightFactorSum = comp.heightFactorSum[comp.highestColumn]
 
   var spacePerHeightFactorHighestCol =
-    if highestColWidthFactorSum > 0 and remainingHeightInHighestPlace > 0:
-      int32(remainingHeightInHighestPlace / highestColWidthFactorSum)
+    if highestColHeightFactorSum > 0 and remainingHeightInHighestPlace > 0:
+      int32(remainingHeightInHighestPlace / highestColHeightFactorSum)
     else:
       0
 
