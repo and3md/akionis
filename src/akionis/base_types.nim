@@ -82,7 +82,7 @@ type
     offsetX: float32
     offsetY: float32
     isClipChildren*: bool = false ## Clips children to his size
-  
+
   ScriptComponent* = ref object of Component ## Component that runs update method
 
   ClosureComponent* = ref object of Component ## Component that runs onUpdate callback
@@ -680,7 +680,7 @@ proc getFirstChildWithUiComponent*(
     node: Node
 ): Option[tuple[node: Node, comp: UiComponent]] =
   ## Returns first child width UiComponent
-  return node.getFirstChildWithComponentOfType[:UiComponent]()
+  return getFirstChildWithComponentOfType[UiComponent](node)
 
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
