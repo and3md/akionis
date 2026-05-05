@@ -675,6 +675,12 @@ proc getFirstChildWithComponentOfType*[T](
       return some((node: child, comp: comp))
   return none(tuple[node: Node, comp: T])
 
+proc getFirstChildWithUiComponent*(
+    node: Node
+): Option[tuple[node: Node, comp: UiComponent]] =
+  ## Returns first child width UiComponent
+  return node.getFirstChildWithComponentOfType[:UiComponent]()
+
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
   for comp in node.components:
