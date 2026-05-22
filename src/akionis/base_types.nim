@@ -1160,7 +1160,11 @@ proc doProcessEvent(state: State, event: Event) =
                 echo "new focus ", widget.name
               else:
                 echo "new focus - none"
-              state.rootNode.keyboardFocus = widget
+              if not widget.isNil: 
+                state.rootNode.keyboardFocus = widget
+              else:
+                # start searching from begining
+                state.rootNode.searchKeyboardFocusWidget  
             else:
               state.rootNode.searchKeyboardFocusWidget
 
