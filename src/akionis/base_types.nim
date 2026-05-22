@@ -1131,7 +1131,7 @@ proc doProcessEvent(state: State, event: Event) =
       if event of MouseMoveEvent:
         state.rootNode.lastMouseHover = state.rootNode.currentMouseHover
         shouldCheckHover = true
-      elif event of TextRuneEvent:
+      elif event of TextRuneEvent or event of KeyboardPressEvent:
         # keyboard event 
         if not state.rootNode.keyboardFocus.isNil:
           var notUsed = false
@@ -1309,6 +1309,11 @@ proc handleEvents*(game: Game) =
   if unicode != 0:
     let runeEvent = newTextRuneEvent(unicode)
     game.state.doProcessEvent(runeEvent)
+
+  let key = ray.getKeyPressed()
+  if key != KeyboardKey.Null:
+    let keyEvent = newKeyboardPressEvent(key)
+    game.state.doProcessEvent(keyEvent)
 
 proc updateGame*(game: Game, deltaTime: float32) =
   #echo ("update - start")
