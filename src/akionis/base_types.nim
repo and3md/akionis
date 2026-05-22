@@ -685,6 +685,8 @@ proc makeDirty*(node: Node) =
 
 proc getRootNode*(node: Node): RootNode =
   ## Gets RootNode from any other node in hierarchy
+  if node.isNil:
+    return nil
   if node of RootNode:
     return RootNode(node)
   if node.parent.isNil:
