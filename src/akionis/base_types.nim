@@ -77,6 +77,8 @@ type
     mouseEventTarget*: Widget ## Widget that intercepts mouse events
     lastMouseHover: Widget
     currentMouseHover: Widget
+    keyboardFocus: Widget
+    shouldSearchForKeyboardFocusWidget: bool
 
   Component* = ref object of RootObj
     name*: string
