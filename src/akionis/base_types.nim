@@ -735,6 +735,13 @@ proc getFirstComponentOfType*[T](node: Node): T =
       return T(comp)
   return nil
 
+iterator getComponentsOfType*[T](node: Node): T =
+  var comp: T
+  for c in node.components:
+    if c of T:
+      comp = T(c)
+      yield comp
+
 iterator getChildren*(node: Node): Node =
   ## Node children iterator
   for n in node.children:
