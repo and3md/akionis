@@ -991,9 +991,11 @@ proc searchKeyboardFocusWidget(node: RootNode) =
       let widget = n.getNextFocusableWidget(nil)
       if not widget.isNil:
         node.keyboardFocus = widget
-        echo "ustawiono ", widget.name
-        return
-  echo "nie ustawiono"
+        echo "focus set to: ", widget.name
+      
+      # getNextFocusableWidget works recursively so we stops here
+      return
+  echo "no keyboard focus widget found"
 
 proc doProcessEvent(node: RootNode, event: Event) =
   if event.isHandled:
