@@ -937,6 +937,11 @@ proc doUpdate(node: Node, deltaTime: float) =
     child.doUpdate(deltaTime)
 
 # RootNode -------------------------------------------------
+proc newRootNode*(): RootNode =
+  result = new(RootNode)
+  result.initNode(0'f32, 0'f32, 1'f32, 1'f32, 0'f32)
+  result.shouldSearchForKeyboardFocusWidget = true
+
 
 proc doProcessEvent(node: RootNode, event: Event) =
   if event.isHandled:
@@ -1036,7 +1041,7 @@ proc renderWithAllCameras(node: RootNode) =
 
 proc initState*(self: State, game: Game, name: string) =
   self.name = name
-  self.rootNode = new(RootNode)
+  self.rootNode = newRootNode()
   self.rootNode.parentState = self
   self.game = game
 
