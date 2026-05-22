@@ -583,6 +583,8 @@ proc doProcessEvent*(comp: Widget, event: Event, shouldResetCurrentHover: var bo
     if event of MouseMoveEvent:
       if shouldProcess:
         rootNode.currentMouseHover = comp
+  else:
+    shouldProcess = true
 
   if shouldProcess:
     # First we check children if no child handles the event
