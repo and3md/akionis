@@ -83,6 +83,18 @@ method processEvent*(comp: ButtonWidget, event: Event) =
   elif event of MouseEnterEvent:
     comp.state = ButtonState.Hover
     event.isHandled = true
+  elif event of TextRuneEvent:
+    # just for testing
+    let runeEvent = TextRuneEvent(event)
+    echo comp.name
+    event.isHandled = true
+  elif event of KeyboardPressEvent:
+    let keyEvent = KeyboardPressEvent(event)
+    echo comp.name
+    if keyEvent.key == KeyboardKey.Enter:
+      event.isHandled = true
+      if not comp.onClick.isNil:
+        comp.onClick(comp)
 
 method update*(comp: ButtonWidget, deltaTime: float32) =
   # custom user update proc
