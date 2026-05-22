@@ -1,3 +1,4 @@
+import std/unicode
 import matrices
 from raylib as ray import nil
 
@@ -27,6 +28,9 @@ type
 
   MouseEnterEvent* = ref object of MouseEvent
   MouseExitEvent* = ref object of MouseEvent
+
+  TextRuneEvent* = ref object of Event
+    rune: Rune
 
 proc newMousePressEvent*(
     screenMousePos: Vector2, pressedButton: MouseButton
@@ -76,3 +80,10 @@ proc newMouseExitEvent*(
 ): MouseExitEvent =
   result = new (MouseExitEvent)
   result.screenMousePos = screenMousePos
+
+proc newTextRuneEvent*(rune: int32): TextRuneEvent =
+  result = new (TextRuneEvent)
+  result.rune = Rune(rune)
+
+proc rune*(event: TextRuneEvent): Rune =
+  return event.rune
