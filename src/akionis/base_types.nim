@@ -517,6 +517,18 @@ proc `size=`*(comp: Widget, newSize: Size) =
   if comp.isExisting and (not comp.parent.isNil):
     comp.parent.isDirty = true
 
+proc isFocusable*(comp: Widget): bool =
+  return comp.isFocusable
+
+proc `isFocusable=`*(comp: Widget, newValue: bool) =
+  if comp.isFocusable == newValue:
+    return
+  comp.isFocusable = newValue
+  let root = getRootNode(comp.parent)
+  if not root.isNil:
+    if root.keyboardFocus == comp and comp.isFocusable == false:
+      root.keyboardFocus = nil
+
 proc getWidgetArea*(comp: Widget): Rect =
   ## Returns local pos and size rect
   result.x = comp.offsetX
