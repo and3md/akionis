@@ -1154,6 +1154,14 @@ proc doProcessEvent(state: State, event: Event) =
           newMouseEnterEvent(ray.getMousePosition())
         )
 
+proc checkFocus(state: State) = 
+  if state.subState.isNil:
+    if state.rootNode.shouldSearchForKeyboardFocusWidget:
+      state.rootNode.searchKeyboardFocusWidget()
+      state.rootNode.shouldSearchForKeyboardFocusWidget = false
+  elif not state.subState.isNil:
+    state.subState.checkFocus
+
 proc doUpdate(state: State, deltaTime: float32) =
   ## Takes care of correct updating everything
   if state.persistentUpdate or state.subState.isNil:
