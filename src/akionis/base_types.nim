@@ -117,7 +117,8 @@ type
     onSizeChanged*: proc(comp: Widget)
     padding: UiPadding ## space between conntent and border
     isEnabled: bool ## is widget enabled
-    wantTabFocus: bool ## do widget wants focus from tab key 
+    isFocusable: bool ## does widget want keyboard focus?
+    isChildrenFocusable: bool ## can a widget have children that might want focus?
     tabIndex: Positive ## tab index in parent 
 
   UiPadding* = object
