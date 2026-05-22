@@ -1136,7 +1136,24 @@ proc doProcessEvent(state: State, event: Event) =
         if not state.rootNode.keyboardFocus.isNil:
           var notUsed = false
           state.rootNode.keyboardFocus.doProcessEvent(event, notUsed)
-          # do not propagate keyboard events
+
+        # check for Tab button to change keyboardFocus
+        # only if isHanled not
+        if event of KeyboardPressEvent and event.isHandled == false:
+          let keyEvent = KeyboardPressEvent(event)
+          if keyEvent.key == KeyboardKey.Tab:
+            echo "tab"
+            if not state.rootNode.keyboardFocus.isNil and not state.rootNode.keyboardFocus.parent.isNil:
+              let widget = state.rootNode.keyboardFocus.parent.getNextFocusableWidget(state.rootNode.keyboardFocus)
+              if not widget.isNil:
+                echo "new focus ", widget.name
+              else:
+                echo "new focus - none"
+              state.rootNode.keyboardFocus = widget
+            else:
+              state.rootNode.searchKeyboardFocusWidget
+
+        # do not propagate keyboard events
         return
       # other events
       state.rootNode.doProcessEvent(event)
