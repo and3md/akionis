@@ -24,6 +24,7 @@ proc newButtonWidget*(parentNode: Node, name: string = ""): ButtonWidget =
   result.color[ButtonState.Hover] = Yellow
   result.state = ButtonState.Up
   result.size = Size(width: 200, height: 40)
+  result.isFocusable = true
   parentNode.addComponent(result)
 
 proc newNodeWithButtonWidget*(parentNode: Node, widgetName: string = ""): tuple[node: Node, widget: ButtonWidget] =
