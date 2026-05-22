@@ -1129,6 +1129,14 @@ proc doProcessEvent(state: State, event: Event) =
       if event of MouseMoveEvent:
         state.rootNode.lastMouseHover = state.rootNode.currentMouseHover
         shouldCheckHover = true
+      elif event of TextRuneEvent:
+        # keyboard event 
+        if not state.rootNode.keyboardFocus.isNil:
+          var notUsed = false
+          state.rootNode.keyboardFocus.doProcessEvent(event, notUsed)
+          # do not propagate keyboard events
+        return
+      # other events
       state.rootNode.doProcessEvent(event)
   if event.isHandled:
     if shouldCheckHover:
