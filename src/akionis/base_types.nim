@@ -779,6 +779,34 @@ proc getFirstChildWithWidget*(node: Node): Option[tuple[node: Node, comp: Widget
   ## Returns first child with Widget
   return getFirstChildWithComponentOfType[Widget](node)
 
+proc getSiblingNodeNextTo*(node: Node): Node =
+  ## Returns next sibling or nil
+  if node.parent.isNil:
+    return nil
+  let index = node.parent.children.find(node)
+  if index == -1:
+    return nil
+  if index + 1 < node.parent.children.len:
+    return node.parent.children[index + 1]
+  return nil
+
+proc getSiblingNodeNextToWithComponent*[T](node: Node): Node =
+  ## Returns next sibling with T component or nil
+  if node.parent.isNil:
+    return nil
+  let index = node.parent.children.find(node)
+  if index == -1:
+    return nil
+  if index + 1 <= node.parent.children.high:
+    for n in node.parent.children[index + 1 .. node.parent.children.high]:
+      if hasComponentOfType[T](n):
+        return n
+  return nil
+
+proc getSiblingNodeNextToWithWidget*(node: Node): Node =
+  ## Returns next sibling with Widget or nil
+  return getSiblingNodeNextToWithComponent[Widget](node)
+
 method calculateWorldBoundingBox(node: Node): Rect =
   var wasFirst = false
   for comp in node.components:
