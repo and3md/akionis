@@ -936,12 +936,51 @@ proc doUpdate(node: Node, deltaTime: float) =
   for child in node.children:
     child.doUpdate(deltaTime)
 
+proc getNextFocusableWidget(node: Node, currentlyFocused: Widget): Widget =
+  # first check itself, if there is a widget that can be focused return it
+  let currentlyFocusedInThisNode = if currentlyFocused.isNil: false else: node == currentlyFocused.parent
+  var wasCurrentlyFocused = false
+  for comp in getComponentsOfType[Widget](node):
+    if currentlyFocusedInThisNode and not wasCurrentlyFocused:
+      if comp == currentlyFocused:
+        wasCurrentlyFocused = true
+        continue
+    if currentlyFocusedInThisNode and not wasCurrentlyFocused:
+      continue
+    if comp.isEnabled and comp.isFocusable:
+      return comp
+
+  # now check first children 
+  let firstChildren = node.getFirstChildWithWidget()
+  if firstChildren.isSome:
+    let widget = firstChildren.get.node.getNextFocusableWidget(currentlyFocused)
+    if not widget.isNil:
+      return widget
+
+  #if no children, check node behind parent 
+  let nextSibling = node.getSiblingNodeNextToWithWidget
+  if not nextSibling.isNil:
+    let widget = nextSibling.getNextFocusableWidget(currentlyFocused)
+    return widget
+  return nil
+
 # RootNode -------------------------------------------------
 proc newRootNode*(): RootNode =
   result = new(RootNode)
   result.initNode(0'f32, 0'f32, 1'f32, 1'f32, 0'f32)
   result.shouldSearchForKeyboardFocusWidget = true
 
+
+proc searchKeyboardFocusWidget(node: RootNode) =
+  ## Searches for first focus widget
+  for n in node.children:
+    if hasComponentOfType[Widget](n):
+      let widget = n.getNextFocusableWidget(nil)
+      if not widget.isNil:
+        node.keyboardFocus = widget
+        echo "ustawiono ", widget.name
+        return
+  echo "nie ustawiono"
 
 proc doProcessEvent(node: RootNode, event: Event) =
   if event.isHandled:
