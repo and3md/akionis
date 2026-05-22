@@ -49,17 +49,15 @@ proc newMouseReleaseEvent*(
   result.screenMousePos = screenMousePos
   result.releasedButton = releasedButton
 
-proc releasedButton*(event: MouseReleaseEvent): MouseButton = 
+proc releasedButton*(event: MouseReleaseEvent): MouseButton =
   return event.releasedButton
 
-proc newMouseMoveEvent*(
-    screenMousePos, deltaMove: Vector2
-): MouseMoveEvent =
+proc newMouseMoveEvent*(screenMousePos, deltaMove: Vector2): MouseMoveEvent =
   result = new (MouseMoveEvent)
   result.screenMousePos = screenMousePos
   result.deltaMove = deltaMove
 
-proc deltaMove*(event: MouseMoveEvent): Vector2 = 
+proc deltaMove*(event: MouseMoveEvent): Vector2 =
   return event.deltaMove
 
 proc newMouseWheelMoveEvent*(
@@ -69,15 +67,11 @@ proc newMouseWheelMoveEvent*(
   result.screenMousePos = screenMousePos
   result.deltaWheelMove = deltaWheelMove
 
-proc newMouseEnterEvent*(
-    screenMousePos: Vector2
-): MouseEnterEvent =
+proc newMouseEnterEvent*(screenMousePos: Vector2): MouseEnterEvent =
   result = new (MouseEnterEvent)
   result.screenMousePos = screenMousePos
 
-proc newMouseExitEvent*(
-    screenMousePos: Vector2
-): MouseExitEvent =
+proc newMouseExitEvent*(screenMousePos: Vector2): MouseExitEvent =
   result = new (MouseExitEvent)
   result.screenMousePos = screenMousePos
 
