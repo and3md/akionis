@@ -1291,6 +1291,14 @@ proc handleEvents*(game: Game) =
     let event = newMouseWheelMoveEvent(mouseScreenPos, mouseWheelDelta)
     game.state.doProcessEvent(event)
 
+  # Keyboard
+  game.state.checkFocus
+
+  let unicode = ray.getCharPressed()
+  if unicode != 0:
+    let runeEvent = newTextRuneEvent(unicode)
+    game.state.doProcessEvent(runeEvent)
+
 proc updateGame*(game: Game, deltaTime: float32) =
   #echo ("update - start")
   if not game.state.isNil:
