@@ -1152,6 +1152,7 @@ proc doProcessEvent(state: State, event: Event) =
             newMouseEnterEvent(ray.getMousePosition())
           )
     return
+  # nodes do not handle event let's state try
   state.processEvent(event)
   if shouldCheckHover:
     if state.rootNode.lastMouseHover != state.rootNode.currentMouseHover:
