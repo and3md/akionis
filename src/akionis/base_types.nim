@@ -964,6 +964,17 @@ proc getNextFocusableWidget(node: Node, currentlyFocused: Widget): Widget =
   if not nextSibling.isNil:
     let widget = nextSibling.getNextFocusableWidget(currentlyFocused)
     return widget
+  else:
+    # if no node behind parent we should check for higher ancestor levels
+    var ancestor = node.parent
+    while not ancestor.isNil:
+      let ancestorNextSibling = ancestor.getSiblingNodeNextToWithWidget
+      if not ancestorNextSibling.isNil:
+        let widget = ancestorNextSibling.getNextFocusableWidget(currentlyFocused)
+        return widget
+      ancestor = ancestor.parent
+
+  # no higher ancestor levels return nil
   return nil
 
 # RootNode -------------------------------------------------
