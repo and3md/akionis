@@ -29,6 +29,12 @@ type
   MouseEnterEvent* = ref object of MouseEvent
   MouseExitEvent* = ref object of MouseEvent
 
+  KeyboardEvent* = ref object of Event
+    key: KeyboardKey
+
+  KeyboardPressEvent* = ref object of KeyboardEvent
+  KeyboardReleaseEvent* = ref object of KeyboardEvent
+
   TextRuneEvent* = ref object of Event
     rune: Rune
 
@@ -74,6 +80,21 @@ proc newMouseEnterEvent*(screenMousePos: Vector2): MouseEnterEvent =
 proc newMouseExitEvent*(screenMousePos: Vector2): MouseExitEvent =
   result = new (MouseExitEvent)
   result.screenMousePos = screenMousePos
+
+proc newEvent*(rune: int32): TextRuneEvent =
+  result = new (TextRuneEvent)
+  result.rune = Rune(rune)
+
+proc key*(event: KeyboardEvent): KeyboardKey = 
+  return event.key
+
+proc newKeyboardPressEvent*(key: KeyboardKey): KeyboardPressEvent =
+  result = new (KeyboardPressEvent)
+  result.key = key
+
+proc newKeyboardReleaseEvent*(key: KeyboardKey): KeyboardReleaseEvent =
+  result = new (KeyboardReleaseEvent)
+  result.key = key
 
 proc newTextRuneEvent*(rune: int32): TextRuneEvent =
   result = new (TextRuneEvent)
