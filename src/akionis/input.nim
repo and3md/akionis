@@ -49,3 +49,18 @@ proc isMouseButtonReleasedUnfiltered*(input: Input, button: MouseButton): bool =
   ## Was mouse button released in this frame (without checking was it handled by ui)
   return ray.isMouseButtonReleased(button)
 
+proc isKeyPressedUnfiltered*(input: Input, key: KeyboardKey): bool =
+  ## Was keyboard key pressed in this frame (without checking was it handled by ui)
+  return ray.isKeyPressed(key)
+
+proc isKeyDownUnfiltered*(input: Input, key: KeyboardKey): bool =
+  ## Is keyboard key still down (without checking was it handled by ui)? 
+  return ray.isKeyDown(key)
+
+proc isKeyUpUnfiltered*(input: Input, key: KeyboardKey): bool =
+  ## Is mouse button still up (without checking was it handled by ui)? 
+  return ray.isKeyUp(key)
+
+proc isKeyReleasedUnfiltered*(input: Input, key: KeyboardKey): bool =
+  ## Was keyboard key released in this frame (without checking was it handled by ui)
+  return ray.isKeyReleased(key)
