@@ -7,3 +7,6 @@ maintainers = ["Andrzej Kilijański <and3md@gmail.com>"]
 licenses = "MIT"
 website = "https://akionis.com"
 tags = ["game-engine"]
+
+[[depends-on]]
+raylib = "^2.0.0"
