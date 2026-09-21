@@ -14,6 +14,10 @@ project Akionis is
      external ("AKIONIS_LIBRARY_TYPE", external ("LIBRARY_TYPE", "static"));
    for Library_Kind use Library_Type;
 
+   -- package Linker is
+      -- for Linker_Options use ("-lraylib", "-lm");
+   -- end Linker;
+
    package Compiler is
       for Default_Switches ("Ada") use Akionis_Config.Ada_Compiler_Switches;
    end Compiler;
