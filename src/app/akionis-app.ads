@@ -1,5 +1,5 @@
 package Akionis.App is
 
-    procedure Init;
+   procedure Init;
 
 end Akionis.App;
