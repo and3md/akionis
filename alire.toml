@@ -1,0 +1,9 @@
+name = "akionis"
+description = "Experimental game engine in Ada language"
+version = "0.1.0-dev"
+
+authors = ["Andrzej Kilijański"]
+maintainers = ["Andrzej Kilijański <and3md@gmail.com>"]
+licenses = "MIT"
+website = "https://akionis.com"
+tags = ["game-engine"]
